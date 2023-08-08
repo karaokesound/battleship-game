@@ -24,12 +24,10 @@ namespace BattleshipGame
 
             app.UseStaticFiles();
 
-            app.UseRouting();
-
-            app.UseEndpoints(cfg =>
+            app.UseMvc(cfg =>
             {
-                cfg.MapControllerRoute("Default", "/{controller}/{action}/{id?}",
-                  new { Controller = "App", action = "Index" });
+                cfg.MapRoute("Default", "{controller/{action}/{id?}",
+                    new { controller = "App", Action = "Index" });
             });
         }
     }
