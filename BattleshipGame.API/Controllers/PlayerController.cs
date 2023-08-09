@@ -1,7 +1,9 @@
 ﻿using BattleshipGame.API.Models;
+using BattleshipGame.API.Services;
 using BattleshipGame.API.Stores;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualStudio.Services.Common;
 
 namespace BattleshipGame.API.Controllers
 {
@@ -11,22 +13,40 @@ namespace BattleshipGame.API.Controllers
     {
         private readonly ILogger<PlayerDto> _logger;
 
-        public PlayerController(ILogger<PlayerDto> logger)
+        private readonly IPlayersRepository _playersRepository;
+
+        public PlayerController(ILogger<PlayerDto> logger, IPlayersRepository playersRepository)
         {
             _logger = logger;
+            _playersRepository = playersRepository;
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<PlayerDto>> GetPlayers()
+        public async Task<ActionResult<IEnumerable<PlayerDto>>> GetPlayers()
         {
-            return Ok(PlayersDataStore.Current.Players);
+            var dbPlayers = await _playersRepository.GetPlayers();
+
+            List<PlayerDto> players = new List<PlayerDto>();
+
+            foreach (var player in dbPlayers)
+            {
+                var playerDto = new PlayerDto()
+                {
+                    Id = player.Id,
+                    Name = player.Name,
+                    City = player.City,
+                };
+
+                players.Add(playerDto);
+            }
+
+            return Ok(players);
         }
 
         [HttpGet("{playerid}", Name = "GetPlayer")]
-        public ActionResult<PlayerDto> GetPlayer(int playerId)
+        public async Task<ActionResult<PlayerDto>> GetPlayer(int playerId)
         {
-            PlayerDto selectedPlayer = PlayersDataStore.Current.Players
-                .FirstOrDefault(i => i.Id == playerId);
+            var selectedPlayer = await _playersRepository.GetPlayer(playerId);
 
             if (selectedPlayer == null)
             {
