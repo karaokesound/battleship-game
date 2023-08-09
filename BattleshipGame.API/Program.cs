@@ -1,5 +1,8 @@
 // This CreateBuilder(args) method configures logging providers.
 // We can also configure it manually in this place.
+using BattleshipGame.Data.DbContexts;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -11,6 +14,10 @@ builder.Services.AddControllers(options =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+// MY SERVICES
+builder.Services.AddDbContext<BattleshipGameDbContext>(dbContextOptions =>
+dbContextOptions.UseSqlite(builder.Configuration["ConnectionStrings:BattleshipGameDBConnectionString"]));
 
 var app = builder.Build();
 
