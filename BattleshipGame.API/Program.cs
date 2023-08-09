@@ -1,3 +1,5 @@
+// This CreateBuilder(args) method configures logging providers.
+// We can also configure it manually in this place.
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

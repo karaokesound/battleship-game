@@ -2,7 +2,6 @@
 using BattleshipGame.API.Stores;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualStudio.Services.WebApi.Patch;
 
 namespace BattleshipGame.API.Controllers
 {
@@ -10,6 +9,13 @@ namespace BattleshipGame.API.Controllers
     [Route("api/players")]
     public class PlayerController : ControllerBase
     {
+        private readonly ILogger<PlayerDto> _logger;
+
+        public PlayerController(ILogger<PlayerDto> logger)
+        {
+            _logger = logger;
+        }
+
         [HttpGet]
         public ActionResult<IEnumerable<PlayerDto>> GetPlayers()
         {
@@ -19,12 +25,16 @@ namespace BattleshipGame.API.Controllers
         [HttpGet("{playerid}", Name = "GetPlayer")]
         public ActionResult<PlayerDto> GetPlayer(int playerId)
         {
-            PlayerDto player = PlayersDataStore.Current.Players
+            PlayerDto selectedPlayer = PlayersDataStore.Current.Players
                 .FirstOrDefault(i => i.Id == playerId);
 
-            if (player == null) return NotFound();
+            if (selectedPlayer == null)
+            {
+                _logger.LogWarning($"Player with id {playerId} doesn't found");
+                return NotFound();
+            }
 
-            return Ok(player);
+            return Ok(selectedPlayer);
         }
 
         [HttpPost]
@@ -35,7 +45,7 @@ namespace BattleshipGame.API.Controllers
 
             var newPlayer = new PlayerDto()
             {
-                Id = maxExistingId + 1,
+                Id = ++maxExistingId,
                 Name = playerForCreation.Name,
                 City = playerForCreation.City,
             };
@@ -55,13 +65,13 @@ namespace BattleshipGame.API.Controllers
         [HttpPut("{playerid}")]
         public ActionResult UpdatePlayer(int playerId, PlayerForUpdateDto playerForUpdate)
         {
-            var playerToUpdate = PlayersDataStore.Current.Players
+            var selectedPlayer = PlayersDataStore.Current.Players
                 .FirstOrDefault(i => i.Id == playerId);
 
-            if (playerToUpdate == null) return NotFound("Sorry! There is no user with this id. Try again.");
+            if (selectedPlayer == null) return NotFound("Sorry! There is no user with this id. Try again.");
 
-            playerToUpdate.Name = playerForUpdate.Name;
-            playerToUpdate.City = playerForUpdate.City;
+            selectedPlayer.Name = playerForUpdate.Name;
+            selectedPlayer.City = playerForUpdate.City;
 
             return NoContent();
         }
@@ -69,23 +79,38 @@ namespace BattleshipGame.API.Controllers
         [HttpPatch("{playerId}")]
         public ActionResult PartiallyUpdatePlayer(int playerId, JsonPatchDocument<PlayerForUpdateDto> patchDocument)
         {
-            var playerFromStore = PlayersDataStore.Current.Players
+            var selectedPlayer = PlayersDataStore.Current.Players
                 .FirstOrDefault(i => i.Id == playerId);
 
             var playerToPatch = new PlayerForUpdateDto()
             {
-                Name = playerFromStore.Name,
-                City = playerFromStore.City
+                Name = selectedPlayer.Name,
+                City = selectedPlayer.City
             };
 
             patchDocument.ApplyTo(playerToPatch, ModelState);
 
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            playerFromStore.Name = playerToPatch.Name;
-            playerFromStore.City = playerToPatch.City;
+            if (!TryValidateModel(playerToPatch)) return BadRequest();
+
+            selectedPlayer.Name = playerToPatch.Name;
+            selectedPlayer.City = playerToPatch.City;
 
             return NoContent();
+        }
+
+        [HttpDelete("{playerid}")]
+        public ActionResult DeletePlayer(int playerId)
+        {
+            var selectedPlayer = PlayersDataStore.Current.Players
+                .FirstOrDefault(i => i.Id == playerId);
+
+            if (selectedPlayer == null) return NotFound();
+
+            PlayersDataStore.Current.Players.Remove(selectedPlayer);
+
+            return Ok("Player successfully deleted");
         }
     }
 }
