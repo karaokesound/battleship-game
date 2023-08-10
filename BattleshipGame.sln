@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BattleshipGame.API", "Battl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BattleshipGame.Data", "BattleshipGame.Data\BattleshipGame.Data.csproj", "{20698FBF-F193-4010-B895-645D56725C93}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BattleshipGame.Logic", "BattleshipGame.Logic\BattleshipGame.Logic.csproj", "{56D98302-1D0C-4DE4-BE55-21B3664826E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{20698FBF-F193-4010-B895-645D56725C93}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20698FBF-F193-4010-B895-645D56725C93}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20698FBF-F193-4010-B895-645D56725C93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56D98302-1D0C-4DE4-BE55-21B3664826E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56D98302-1D0C-4DE4-BE55-21B3664826E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56D98302-1D0C-4DE4-BE55-21B3664826E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56D98302-1D0C-4DE4-BE55-21B3664826E8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

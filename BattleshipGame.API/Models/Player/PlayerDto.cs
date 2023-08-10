@@ -1,4 +1,4 @@
-﻿namespace BattleshipGame.API.Models
+﻿namespace BattleshipGame.API.Models.Player
 {
     public class PlayerDto
     {
