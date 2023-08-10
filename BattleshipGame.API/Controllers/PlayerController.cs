@@ -1,11 +1,9 @@
 ﻿using AutoMapper;
 using BattleshipGame.API.Models;
 using BattleshipGame.API.Services;
-using BattleshipGame.API.Stores;
 using BattleshipGame.Data.Entities;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualStudio.Services.Common;
 
 namespace BattleshipGame.API.Controllers
 {
