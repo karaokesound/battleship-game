@@ -8,7 +8,7 @@ namespace BattleshipGame.API.Services
 
         Task<IEnumerable<Player>> GetPlayersAsync();
 
-        Task CreatePlayerAsync(Player player);
+        Task<bool> CreatePlayerAsync(Player player);
 
         void DeletePlayer(Player player);
 

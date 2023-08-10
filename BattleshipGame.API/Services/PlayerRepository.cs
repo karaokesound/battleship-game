@@ -24,11 +24,15 @@ namespace BattleshipGame.API.Services
             return await _context.Players.ToListAsync();
         }
 
-        public async Task CreatePlayerAsync(Player player)
+        public async Task<bool> CreatePlayerAsync(Player player)
         {
-            if (player == null) return;
+            var doesPlayerNameExist = await _context.Players
+                .AnyAsync(n => n.Name == player.Name);
+
+            if (doesPlayerNameExist || player == null) return false; 
 
             _context.Players.Add(player);
+            return true;
         }
 
         public void DeletePlayer(Player player)

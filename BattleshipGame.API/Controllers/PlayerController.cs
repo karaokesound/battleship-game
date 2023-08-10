@@ -17,11 +17,17 @@ namespace BattleshipGame.API.Controllers
 
         private readonly IMapper _mapper;
 
-        public PlayerController(ILogger<PlayerDto> logger, IPlayersRepository playersRepository, IMapper mapper)
+        private readonly IMessageService _message;
+
+        public PlayerController(ILogger<PlayerDto> logger, 
+            IPlayersRepository playersRepository, 
+            IMapper mapper,
+            IMessageService message)
         {
             _logger = logger;
             _playersRepository = playersRepository;
             _mapper = mapper;
+            _message = message;
         }
 
         [HttpGet]
@@ -42,7 +48,7 @@ namespace BattleshipGame.API.Controllers
             if (selectedPlayer == null)
             {
                 _logger.LogWarning($"Player with id {playerId} doesn't found");
-                return NotFound();
+                return NotFound(_message.PlayerNotFoundMessage());
             }
 
             return Ok(_mapper.Map<PlayerDto>(selectedPlayer));
@@ -53,7 +59,9 @@ namespace BattleshipGame.API.Controllers
         {
             var newPlayer = _mapper.Map<Player>(playerForCreation);
 
-            await _playersRepository.CreatePlayerAsync(newPlayer);
+            var result = await _playersRepository.CreatePlayerAsync(newPlayer);
+
+            if (result == false) return BadRequest(_message.UserCreatingError());
 
             await _playersRepository.SaveChangesAsync();
 
@@ -72,7 +80,7 @@ namespace BattleshipGame.API.Controllers
         {
             var dbPlayer = await _playersRepository.GetPlayerAsync(playerId);
 
-            if (dbPlayer == null) return NotFound("Sorry! There is no user with this id. Try again.");
+            if (dbPlayer == null) return NotFound(_message.PlayerNotFoundMessage());
 
             _mapper.Map(playerForUpdate, dbPlayer);
 
@@ -84,11 +92,11 @@ namespace BattleshipGame.API.Controllers
         [HttpPatch("{playerId}")]
         public async Task<ActionResult> PartiallyUpdatePlayer(int playerId, JsonPatchDocument<PlayerForUpdateDto> patchDocument)
         {
-            if (_playersRepository.GetPlayerAsync(playerId) == null) return NotFound();
+            var selectedPlayerDb = await _playersRepository.GetPlayerAsync(playerId);
 
-            var selectedPlayer = await _playersRepository.GetPlayerAsync(playerId);
+            if (selectedPlayerDb == null) return NotFound(_message.PlayerNotFoundMessage());
 
-            var playerToPatch = _mapper.Map<PlayerForUpdateDto>(selectedPlayer);
+            var playerToPatch = _mapper.Map<PlayerForUpdateDto>(selectedPlayerDb);
 
             // This method applies provided changes and properties with no changes stays as their are.
             // Without this patching, properties with no changes would be null.
@@ -98,7 +106,7 @@ namespace BattleshipGame.API.Controllers
 
             if (!TryValidateModel(playerToPatch)) return BadRequest();
 
-            _mapper.Map(playerToPatch, selectedPlayer);
+            _mapper.Map(playerToPatch, selectedPlayerDb);
 
             await _playersRepository.SaveChangesAsync();
             
@@ -110,12 +118,12 @@ namespace BattleshipGame.API.Controllers
         {
             var selectedPlayer = await _playersRepository.GetPlayerAsync(playerId);
 
-            if (selectedPlayer == null) return NotFound();
+            if (selectedPlayer == null) return NotFound(_message.PlayerNotFoundMessage());
 
             _playersRepository.DeletePlayer(selectedPlayer);
             await _playersRepository.SaveChangesAsync();
 
-            return Ok("Player successfully deleted");
+            return Ok(_message.Delete());
         }
     }
 }

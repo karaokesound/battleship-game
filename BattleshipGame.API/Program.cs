@@ -21,6 +21,7 @@ builder.Services.AddDbContext<BattleshipGameDbContext>(dbContextOptions =>
 dbContextOptions.UseSqlite(builder.Configuration["ConnectionStrings:BattleshipGameDBConnectionString"]));
 
 builder.Services.AddScoped<IPlayersRepository, PlayerRepository>();
+builder.Services.AddSingleton<IMessageService, MessageService>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
