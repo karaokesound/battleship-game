@@ -4,14 +4,14 @@ namespace BattleshipGame.API.Services
 {
     public interface IPlayersRepository
     {
-        Task<Player> GetPlayer(int playerId);
+        Task<Player> GetPlayerAsync(int playerId);
 
-        Task<IEnumerable<Player>> GetPlayers();
+        Task<IEnumerable<Player>> GetPlayersAsync();
 
-        //Task<Player> UpdatePlayer(int playerId);
+        Task CreatePlayerAsync(Player player);
 
-        //Task<Player> PartiallyUpdatePlayer(int playerId);
+        void DeletePlayer(Player player);
 
-        //Task<Player> DeletePlayer(int playerId);
+        Task<bool> SaveChangesAsync();
     }
 }

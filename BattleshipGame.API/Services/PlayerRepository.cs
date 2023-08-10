@@ -13,30 +13,32 @@ namespace BattleshipGame.API.Services
             _context = context;
         }
 
-        public async Task<Player?> GetPlayer(int playerId)
+        public async Task<Player?> GetPlayerAsync(int playerId)
         {
             return await _context.Players
                 .FirstOrDefaultAsync(i => i.Id == playerId);
         }
 
-        public async Task<IEnumerable<Player>> GetPlayers()
+        public async Task<IEnumerable<Player>> GetPlayersAsync()
         {
             return await _context.Players.ToListAsync();
         }
 
-        //public Task<Player> UpdatePlayer(int playerId)
-        //{
+        public async Task CreatePlayerAsync(Player player)
+        {
+            if (player == null) return;
 
-        //}
+            _context.Players.Add(player);
+        }
 
-        //public Task<Player> PartiallyUpdatePlayer(int playerId)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        public void DeletePlayer(Player player)
+        {
+            _context.Players.Remove(player);
+        }
 
-        //public Task<Player> DeletePlayer(int playerId)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        public async Task<bool> SaveChangesAsync()
+        {
+            return (await _context.SaveChangesAsync() >= 0);
+        }
     }
 }

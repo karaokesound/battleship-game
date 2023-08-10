@@ -1,6 +1,8 @@
-﻿using BattleshipGame.API.Models;
+﻿using AutoMapper;
+using BattleshipGame.API.Models;
 using BattleshipGame.API.Services;
 using BattleshipGame.API.Stores;
+using BattleshipGame.Data.Entities;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.Services.Common;
@@ -15,38 +17,29 @@ namespace BattleshipGame.API.Controllers
 
         private readonly IPlayersRepository _playersRepository;
 
-        public PlayerController(ILogger<PlayerDto> logger, IPlayersRepository playersRepository)
+        private readonly IMapper _mapper;
+
+        public PlayerController(ILogger<PlayerDto> logger, IPlayersRepository playersRepository, IMapper mapper)
         {
             _logger = logger;
             _playersRepository = playersRepository;
+            _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PlayerDto>>> GetPlayers()
         {
-            var dbPlayers = await _playersRepository.GetPlayers();
+            var dbPlayers = await _playersRepository.GetPlayersAsync();
 
             List<PlayerDto> players = new List<PlayerDto>();
 
-            foreach (var player in dbPlayers)
-            {
-                var playerDto = new PlayerDto()
-                {
-                    Id = player.Id,
-                    Name = player.Name,
-                    City = player.City,
-                };
-
-                players.Add(playerDto);
-            }
-
-            return Ok(players);
+            return Ok(_mapper.Map<IEnumerable<PlayerDto>>(dbPlayers));
         }
 
         [HttpGet("{playerid}", Name = "GetPlayer")]
         public async Task<ActionResult<PlayerDto>> GetPlayer(int playerId)
         {
-            var selectedPlayer = await _playersRepository.GetPlayer(playerId);
+            var selectedPlayer = await _playersRepository.GetPlayerAsync(playerId);
 
             if (selectedPlayer == null)
             {
@@ -54,23 +47,17 @@ namespace BattleshipGame.API.Controllers
                 return NotFound();
             }
 
-            return Ok(selectedPlayer);
+            return Ok(_mapper.Map<PlayerDto>(selectedPlayer));
         }
 
         [HttpPost]
-        public ActionResult<PlayerDto> AddPlayer(int id, PlayerForCreationDto playerForCreation)
+        public async Task<ActionResult<PlayerDto>> CreatePlayer(PlayerForCreationDto playerForCreation)
         {
-            var maxExistingId = PlayersDataStore.Current.Players
-                .Max(i => i.Id);
+            var newPlayer = _mapper.Map<Player>(playerForCreation);
 
-            var newPlayer = new PlayerDto()
-            {
-                Id = ++maxExistingId,
-                Name = playerForCreation.Name,
-                City = playerForCreation.City,
-            };
+            await _playersRepository.CreatePlayerAsync(newPlayer);
 
-            PlayersDataStore.Current.Players.Add(newPlayer);
+            await _playersRepository.SaveChangesAsync();
 
             return CreatedAtRoute("GetPlayer",
                 new
@@ -83,52 +70,52 @@ namespace BattleshipGame.API.Controllers
         }
 
         [HttpPut("{playerid}")]
-        public ActionResult UpdatePlayer(int playerId, PlayerForUpdateDto playerForUpdate)
+        public async Task<ActionResult> UpdatePlayer(int playerId, PlayerForUpdateDto playerForUpdate)
         {
-            var selectedPlayer = PlayersDataStore.Current.Players
-                .FirstOrDefault(i => i.Id == playerId);
+            var dbPlayer = await _playersRepository.GetPlayerAsync(playerId);
 
-            if (selectedPlayer == null) return NotFound("Sorry! There is no user with this id. Try again.");
+            if (dbPlayer == null) return NotFound("Sorry! There is no user with this id. Try again.");
 
-            selectedPlayer.Name = playerForUpdate.Name;
-            selectedPlayer.City = playerForUpdate.City;
+            _mapper.Map(playerForUpdate, dbPlayer);
+
+            await _playersRepository.SaveChangesAsync();
 
             return NoContent();
         }
 
         [HttpPatch("{playerId}")]
-        public ActionResult PartiallyUpdatePlayer(int playerId, JsonPatchDocument<PlayerForUpdateDto> patchDocument)
+        public async Task<ActionResult> PartiallyUpdatePlayer(int playerId, JsonPatchDocument<PlayerForUpdateDto> patchDocument)
         {
-            var selectedPlayer = PlayersDataStore.Current.Players
-                .FirstOrDefault(i => i.Id == playerId);
+            if (_playersRepository.GetPlayerAsync(playerId) == null) return NotFound();
 
-            var playerToPatch = new PlayerForUpdateDto()
-            {
-                Name = selectedPlayer.Name,
-                City = selectedPlayer.City
-            };
+            var selectedPlayer = await _playersRepository.GetPlayerAsync(playerId);
 
+            var playerToPatch = _mapper.Map<PlayerForUpdateDto>(selectedPlayer);
+
+            // This method applies provided changes and properties with no changes stays as their are.
+            // Without this patching, properties with no changes would be null.
             patchDocument.ApplyTo(playerToPatch, ModelState);
 
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
             if (!TryValidateModel(playerToPatch)) return BadRequest();
 
-            selectedPlayer.Name = playerToPatch.Name;
-            selectedPlayer.City = playerToPatch.City;
+            _mapper.Map(playerToPatch, selectedPlayer);
 
+            await _playersRepository.SaveChangesAsync();
+            
             return NoContent();
         }
 
         [HttpDelete("{playerid}")]
-        public ActionResult DeletePlayer(int playerId)
+        public async Task<ActionResult> DeletePlayer(int playerId)
         {
-            var selectedPlayer = PlayersDataStore.Current.Players
-                .FirstOrDefault(i => i.Id == playerId);
+            var selectedPlayer = await _playersRepository.GetPlayerAsync(playerId);
 
             if (selectedPlayer == null) return NotFound();
 
-            PlayersDataStore.Current.Players.Remove(selectedPlayer);
+            _playersRepository.DeletePlayer(selectedPlayer);
+            await _playersRepository.SaveChangesAsync();
 
             return Ok("Player successfully deleted");
         }

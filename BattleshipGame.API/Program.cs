@@ -22,6 +22,8 @@ dbContextOptions.UseSqlite(builder.Configuration["ConnectionStrings:BattleshipGa
 
 builder.Services.AddScoped<IPlayersRepository, PlayerRepository>();
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
