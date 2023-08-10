@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BattleshipGame.API.Models
+namespace BattleshipGame.API.Models.Player
 {
-    public class PlayerForCreationDto
+    public class PlayerForUpdateDto
     {
         [Required]
         [MaxLength(20)]

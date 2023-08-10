@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using BattleshipGame.API.Models;
+using BattleshipGame.API.Models.Player;
 using BattleshipGame.Data.Entities;
 
 namespace BattleshipGame.API.Profiles
