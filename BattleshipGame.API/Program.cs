@@ -32,7 +32,7 @@ var serviceProvider = new ServiceCollection()
                 .BuildServiceProvider();
 
 // Tworzenie obiektu GameSettings i przekazanie wstrzykniêtego IValidationService
-var gameSettings = new GameSettings(10, 10, 9, serviceProvider.GetRequiredService<IValidationService>());
+var gameSettings = new GameCore(10, 10, 9, serviceProvider.GetRequiredService<IValidationService>());
 
 var app = builder.Build();
 

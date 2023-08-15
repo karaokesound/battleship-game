@@ -3,7 +3,7 @@ using BattleshipGame.Logic.Services;
 
 namespace BattleshipGame.Logic.Logic
 {
-    public class GameSettings
+    public class GameCore
     {
         public int XField { get; set; }
 
@@ -17,7 +17,7 @@ namespace BattleshipGame.Logic.Logic
 
         private readonly IValidationService _validation;
 
-        public GameSettings(int xField, int yField, int numberOfShips,
+        public GameCore(int xField, int yField, int numberOfShips,
             IValidationService validation)
         {
             XField = xField;
@@ -138,7 +138,6 @@ namespace BattleshipGame.Logic.Logic
                             break;
                         }
                         tryCount++;
-                        continue;
 
                         // vertical
                         if (YDirection == -1 && startX > 0 && !verticalHorizontal)
