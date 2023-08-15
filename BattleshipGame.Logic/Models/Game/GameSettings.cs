@@ -21,9 +21,8 @@
             ShipList = new List<Ship>();
 
             GenerateFields();
-            GenerateShips(numberOfShips);
-            DeployShip();
-            DisplayShips();
+            GenerateRandomCoordinates();
+            DisplayShipsCoordinatesAndGameBoard();
         }
 
         public void GenerateFields()
@@ -35,6 +34,8 @@
                     Fields.Add(new Field(x, y));
                 }
             }
+
+            GenerateShips(NumberOfShips);
         }
 
         public void GenerateShips(int numberOfShips)
@@ -77,12 +78,14 @@
             if (ShipList.Count >= numberOfShips) return;
         }
 
-        public void DeployShip()
+        public void GenerateRandomCoordinates()
         {
             Random random = new Random();
             foreach (var ship in ShipList)
             {
                 int tryCount = 0;
+
+                // Generates random coordinates and tries to validate it.
                 while (tryCount < 30)
                 {
                     int startX = random.Next(0, XField);
@@ -92,7 +95,7 @@
 
                     if (ship.Size == 1)
                     {
-                        if (UpdateField(ship, startX, startY, endX, endY))
+                        if (ValidateFields(ship, startX, startY, endX, endY))
                         {
                             break;
                         }
@@ -102,19 +105,22 @@
             }
         }
 
-        public bool UpdateField(Ship ship, int startX, int startY, int endX, int endY)
+        public bool ValidateFields(Ship ship, int startX, int startY, int endX, int endY)
         {
             var selectedField = Fields.FirstOrDefault(xy => xy.X == startX && xy.Y == startY);
 
-            // Generate random position again
+            // Generates random coordinates again if selected field is occupied
+            // or validation is false.
             if (selectedField.IsEmpty == false || selectedField.IsValid == false)
             {
                 return false;
             }
 
+            // Takes selected field and marked as occupied if validation is true.
             selectedField.IsEmpty = false;
 
-            var unvalidFields = Fields.FindAll(xy => ((xy.X == selectedField.X + 1 || xy.X == selectedField.X - 1) && xy.Y == selectedField.Y)
+            // Inalidates neighboring fields.
+            var invalidFields = Fields.FindAll(xy => ((xy.X == selectedField.X + 1 || xy.X == selectedField.X - 1) && xy.Y == selectedField.Y)
             || ((xy.Y == selectedField.Y - 1 || xy.Y == selectedField.Y + 1) && xy.X == selectedField.X)
             || (xy.X == selectedField.X - 1 && xy.Y == selectedField.Y - 1)
             || (xy.X == selectedField.X - 1 && xy.Y == selectedField.Y + 1)
@@ -124,7 +130,7 @@
             && xy.IsEmpty == true)
                 .ToList();
 
-            foreach (var field in unvalidFields)
+            foreach (var field in invalidFields)
             {
                 field.IsValid = false;
             }
@@ -132,7 +138,7 @@
             return true;
         }
 
-        public void DisplayShips()
+        public void DisplayShipsCoordinatesAndGameBoard()
         {
             int shipCounter = 0;
 
