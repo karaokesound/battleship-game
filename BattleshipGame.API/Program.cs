@@ -1,13 +1,12 @@
 // This CreateBuilder(args) method configures logging providers.
 // We can also configure it manually in this place.
-using BattleshipGame.API.Models.Game;
 using BattleshipGame.API.Services;
 using BattleshipGame.Data.DbContexts;
+using BattleshipGame.Logic.Logic;
+using BattleshipGame.Logic.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
-new GameSettings(10,10,5);
 
 // Add services to the container.
 builder.Services.AddControllers(options =>
@@ -27,6 +26,13 @@ builder.Services.AddScoped<IPlayersRepository, PlayerRepository>();
 builder.Services.AddSingleton<IMessageService, MessageService>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+var serviceProvider = new ServiceCollection()
+                .AddScoped<IValidationService, ValidationService>()
+                .BuildServiceProvider();
+
+// Tworzenie obiektu GameSettings i przekazanie wstrzykniêtego IValidationService
+var gameSettings = new GameSettings(10, 10, 9, serviceProvider.GetRequiredService<IValidationService>());
 
 var app = builder.Build();
 
