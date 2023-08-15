@@ -1,10 +1,13 @@
 // This CreateBuilder(args) method configures logging providers.
 // We can also configure it manually in this place.
+using BattleshipGame.API.Models.Game;
 using BattleshipGame.API.Services;
 using BattleshipGame.Data.DbContexts;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+new GameSettings(10,10,5);
 
 // Add services to the container.
 builder.Services.AddControllers(options =>

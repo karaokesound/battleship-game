@@ -21,124 +21,150 @@
             ShipList = new List<Ship>();
 
             GenerateFields();
-            GenerateShips();
-            DrawShipSettings();
+            GenerateShips(numberOfShips);
+            DeployShip();
+            DisplayShips();
         }
 
         public void GenerateFields()
         {
-            for (int x = 0; x < 10; i++)
+            for (int x = 0; x < 10; x++)
             {
                 for (int y = 0; y < 10; y++)
                 {
-                    new Field(x, y);
+                    Fields.Add(new Field(x, y));
                 }
             }
         }
 
-        public void GenerateShips()
+        public void GenerateShips(int numberOfShips)
         {
+            if (numberOfShips < 5) return;
+
             for (int i = 0; i < 5; i++)
             {
                 ShipList.Add(new Ship(1));
             }
+
+            if (ShipList.Count >= numberOfShips) return;
 
             for (int i = 0; i < 4; i++)
             {
                 ShipList.Add(new Ship(2));
             }
 
+            if (ShipList.Count >= numberOfShips) return;
+
             for (int i = 0; i < 3; i++)
             {
                 ShipList.Add(new Ship(3));
             }
+
+            if (ShipList.Count >= numberOfShips) return;
 
             for (int i = 0; i < 2; i++)
             {
                 ShipList.Add(new Ship(4));
             }
 
+            if (ShipList.Count >= numberOfShips) return;
+
             for (int i = 0; i < 1; i++)
             {
                 ShipList.Add(new Ship(5));
             }
+
+            if (ShipList.Count >= numberOfShips) return;
         }
 
-        public void DrawShipSettings()
+        public void DeployShip()
         {
             Random random = new Random();
             foreach (var ship in ShipList)
             {
-                DeployShip(ship, random);
-            }
-        }
-
-        public void DeployShip(Ship ship, Random randomSpot)
-        {
-            while (true)
-            {
-                int startX = randomSpot.Next(0, XField);
-                int startY = randomSpot.Next(0, YField);
-                int endX = 0;
-                int endY = 0;
-
-                if (ship.Size == 1)
+                int tryCount = 0;
+                while (tryCount < 30)
                 {
-                    UpdateField(ship, startX, startY, endX, endY);
-                    CanPlaceShip(startX, startY, endX, endY);
+                    int startX = random.Next(0, XField);
+                    int startY = random.Next(0, YField);
+                    int endX = 0;
+                    int endY = 0;
+
+                    if (ship.Size == 1)
+                    {
+                        if (UpdateField(ship, startX, startY, endX, endY))
+                        {
+                            break;
+                        }
+                        tryCount++;
+                    }
                 }
-
-                //if (ship.Size == 2)
-                //{
-                //    Random random = new Random();
-                //    int coordinate = random.Next(0, 1);
-
-                //    if (coordinate == 0)
-                //    {
-                //        endX = startX + 1;
-                //        endY = startY;
-                //    }
-                //    endY = startY + 1;
-                //    endX = startX;
-
-                //    if (startX != endX && startY != endY)
-                //    {
-                //        UpdateField(ship, startX, startY, endX, endY);
-                //        CanPlaceShip(startX, startY, endX, endY);
-                //        break;
-                //    }
-
-                //    // Starts this method again.
-                //    DeployShip(ship, randomSpot);
-                //}
             }
         }
 
         public bool UpdateField(Ship ship, int startX, int startY, int endX, int endY)
         {
-            bool result = false;
+            var selectedField = Fields.FirstOrDefault(xy => xy.X == startX && xy.Y == startY);
 
-            if (ship.Size == 1)
+            // Generate random position again
+            if (selectedField.IsEmpty == false || selectedField.IsValid == false)
             {
-                if (Fields.Contains(startX) == false
-                    || YFields.Contains(startY) == false) result = false;
-
-                XFields.RemoveAt(startX);
-                YFields.RemoveAt(startY);
-                result = true;
+                return false;
             }
 
-            return result;
+            selectedField.IsEmpty = false;
 
-            //if (ship.Size == 2)
-            //{
-            //    if (XFields.GetRange()
-            //}
+            var unvalidFields = Fields.FindAll(xy => ((xy.X == selectedField.X + 1 || xy.X == selectedField.X - 1) && xy.Y == selectedField.Y)
+            || ((xy.Y == selectedField.Y - 1 || xy.Y == selectedField.Y + 1) && xy.X == selectedField.X)
+            || (xy.X == selectedField.X - 1 && xy.Y == selectedField.Y - 1)
+            || (xy.X == selectedField.X - 1 && xy.Y == selectedField.Y + 1)
+            || (xy.X == selectedField.X + 1 && xy.Y == selectedField.Y - 1)
+            || (xy.X == selectedField.X + 1 && xy.Y == selectedField.Y + 1)
+            && xy.IsValid == true
+            && xy.IsEmpty == true)
+                .ToList();
+
+            foreach (var field in unvalidFields)
+            {
+                field.IsValid = false;
+            }
+
+            return true;
         }
 
-        public bool CanPlaceShip(int startX, int startY, int endX, int endY)
+        public void DisplayShips()
         {
+            int shipCounter = 0;
 
+            foreach (var field in Fields)
+            {
+                if (field.IsEmpty == true)
+                {
+                    continue;
+                }
+
+                Console.WriteLine($"Ship {shipCounter} coordinate (X, Y): {field.X}, {field.Y}");
+                shipCounter++;
+            }
+            Console.WriteLine();
+
+            for (int y = 0; y < YField; y++)
+            {
+                for (int x = 0; x < XField; x++)
+                {
+                    var field = Fields.FirstOrDefault(f => f.X == x && f.Y == y);
+
+                    if (field != null && !field.IsEmpty)
+                    {
+                        Console.Write("1 ");
+                    }
+                    else
+                    {
+                        Console.Write("0 ");
+                    }
+                }
+                Console.WriteLine();
+            }
         }
     }
 }

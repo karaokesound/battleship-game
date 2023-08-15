@@ -6,9 +6,13 @@
 
         public int Y { get; set; }
 
+        public int ShipSize { get; set; }
+
         public bool IsEmpty;
 
         public bool IsHitted;
+
+        public bool IsValid;
 
         public Field(int x, int y)
         {
@@ -16,6 +20,8 @@
             Y = y;
             IsEmpty = true;
             IsHitted = false;
+            IsValid = true;
+            ShipSize = 0;
         }
     }
 }
