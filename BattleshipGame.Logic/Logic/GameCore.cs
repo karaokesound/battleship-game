@@ -1,5 +1,7 @@
 ﻿using BattleshipGame.API.Models.Game;
+using BattleshipGame.Logic.Models.Game;
 using BattleshipGame.Logic.Services;
+using System.Text;
 
 namespace BattleshipGame.Logic.Logic
 {
@@ -189,7 +191,7 @@ namespace BattleshipGame.Logic.Logic
             return false;
         }
 
-        public void DisplayShipsCoordinatesAndGameBoard()
+        public string DisplayShipsCoordinatesAndGameBoard()
         {
             int countSingleShips = 0;
             int countDoubleShips = 0;
@@ -210,7 +212,7 @@ namespace BattleshipGame.Logic.Logic
                 DisplayShipsCoordinatesAndGameBoard();
             }
 
-            _generatingService.GenerateGameBoard(Fields, XField, YField);
+            return _generatingService.GenerateGameBoard(Fields, XField, YField);
         }
     }
 }

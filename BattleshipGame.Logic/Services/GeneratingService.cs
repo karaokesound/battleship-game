@@ -1,4 +1,6 @@
 ﻿using BattleshipGame.API.Models.Game;
+using BattleshipGame.Logic.Models.Game;
+using System.Text;
 
 namespace BattleshipGame.Logic.Services
 {
@@ -66,63 +68,28 @@ namespace BattleshipGame.Logic.Services
             return shipsList;
         }
 
-        public void GenerateGameBoard(List<Field> fields, int XFields, int YFields)
+        public string GenerateGameBoard(List<Field> fields, int XFields, int YFields)
         {
-            fields = fields.OrderBy(c => c.ShipSize).ToList();
-
-            int shipsCounter = 0;
-
-            // Displays ships coordinates
-
-            foreach (var field in fields)
-            {
-                if (field.IsEmpty)
-                {
-                    continue;
-                }
-
-                if (!field.IsEmpty && field.ShipSize == 1)
-                {
-                    Console.WriteLine($"1-field ship {shipsCounter} coordinate (X, Y): {field.X}, {field.Y}");
-                    shipsCounter++;
-                }
-                else if (!field.IsEmpty && field.ShipSize == 2)
-                {
-                    Console.WriteLine($"2-field ship {shipsCounter} coordinates (X, Y): {field.X}, {field.Y}");
-                    shipsCounter++;
-                }
-                else if (!field.IsEmpty && field.ShipSize == 3)
-                {
-                    Console.WriteLine($"3-field ship {shipsCounter} coordinates (X, Y): {field.X}, {field.Y}");
-                    shipsCounter++;
-                }
-            }
-
-            Console.WriteLine();
-
-            // Generates game board
+            var gameBoard = new StringBuilder();
 
             for (int y = 0; y < YFields; y++)
             {
                 for (int x = 0; x < XFields; x++)
                 {
                     var field = fields.FirstOrDefault(f => f.X == x && f.Y == y);
-
                     if (field != null && !field.IsEmpty)
                     {
-                        Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                        Console.BackgroundColor = ConsoleColor.DarkYellow;
-                        Console.Write("1 ");
-                        Console.ResetColor();
-                        Console.BackgroundColor = ConsoleColor.Black;
+                        gameBoard.Append("1 ");
                     }
                     else
                     {
-                        Console.Write("0 ");
+                        gameBoard.Append("0 ");
                     }
                 }
-                Console.WriteLine();
+                gameBoard.AppendLine();
             }
+
+            return gameBoard.ToString();
         }
     }
 }

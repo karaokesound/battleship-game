@@ -2,7 +2,6 @@
 // We can also configure it manually in this place.
 using BattleshipGame.API.Services;
 using BattleshipGame.Data.DbContexts;
-using BattleshipGame.Logic.Logic;
 using BattleshipGame.Logic.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,17 +25,19 @@ builder.Services.AddScoped<IPlayersRepository, PlayerRepository>();
 builder.Services.AddSingleton<IMessageService, MessageService>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddSingleton<IValidationService, ValidationService>();
+builder.Services.AddSingleton<IGeneratingService, GeneratingService>();
 
-var serviceProvider = new ServiceCollection()
-                .AddSingleton<IValidationService, ValidationService>()
-                .AddSingleton<IGeneratingService, GeneratingService>()
-                .BuildServiceProvider();
+//var serviceProvider = new ServiceCollection()
+//                .AddSingleton<IValidationService, ValidationService>()
+//                .AddSingleton<IGeneratingService, GeneratingService>()
+//                .BuildServiceProvider();
 
-// Tworzenie obiektu GameCore
+//// Tworzenie obiektu GameCore
 
-var gameCore = new GameCore(10, 10, 12,
-    serviceProvider.GetRequiredService<IValidationService>(),
-    serviceProvider.GetRequiredService<IGeneratingService>());
+//var gameCore = new GameCore(10, 10, 12,
+//    serviceProvider.GetRequiredService<IValidationService>(),
+//    serviceProvider.GetRequiredService<IGeneratingService>());
 
 var app = builder.Build();
 

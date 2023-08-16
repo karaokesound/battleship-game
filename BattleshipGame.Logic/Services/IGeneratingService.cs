@@ -1,4 +1,6 @@
 ﻿using BattleshipGame.API.Models.Game;
+using BattleshipGame.Logic.Models.Game;
+using System.Text;
 
 namespace BattleshipGame.Logic.Services
 {
@@ -8,6 +10,6 @@ namespace BattleshipGame.Logic.Services
 
         List<Ship> GenerateShips(int numberOfShips);
 
-        void GenerateGameBoard(List<Field> fields, int XFields, int YFields);
+        string GenerateGameBoard(List<Field> fields, int XFields, int YFields);
     }
 }
