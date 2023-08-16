@@ -11,7 +11,7 @@ namespace BattleshipGame.Logic.Logic
 
         public int YField { get; set; }
 
-        public string Username { get; set; }
+        public string Player { get; set; }
 
         public List<Field> Fields { get; set; }
 
@@ -33,7 +33,7 @@ namespace BattleshipGame.Logic.Logic
             XField = xField;
             YField = yField;
             NumberOfShips = numberOfShips;
-            Username = username;
+            Player = username;
             Fields = new List<Field>();
             ShipList = new List<Ship>();
             _validation = validation;
@@ -175,22 +175,22 @@ namespace BattleshipGame.Logic.Logic
         {
             if (ship.Size == 1)
             {
-                return _validation.OneFieldShipValidation(startX, startY, endX, endY, Fields);
+                return _validation.OneFieldShipValidation(startX, startY, endX, endY, Fields, Player);
             }
 
             if (ship.Size == 2)
             {
-                return _validation.TwoFieldShipValidation(startX, startY, endX, endY, Fields);
+                return _validation.TwoFieldShipValidation(startX, startY, endX, endY, Fields, Player);
             }
 
             if (ship.Size == 3)
             {
-                return _validation.ThreeFieldShipValidation(startX, startY, endX, endY, Fields);
+                return _validation.ThreeFieldShipValidation(startX, startY, endX, endY, Fields, Player);
             }
 
             if (ship.Size == 4)
             {
-                return _validation.FourFieldShipValidation(startX, startY, endX, endY, Fields);
+                return _validation.FourFieldShipValidation(startX, startY, endX, endY, Fields, Player);
             }
 
             return false;

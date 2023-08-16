@@ -15,20 +15,28 @@ namespace BattleshipGame.API.Controllers
 
         private readonly iFieldRepository _fieldRepository;
 
+        private readonly IPlayersRepository _playersRepository;
+
         public GameController(IValidationService validation,
             IGeneratingService generatingService,
-            iFieldRepository fieldRepository)
+            iFieldRepository fieldRepository,
+            IPlayersRepository playersRepository)
         {
             _validation = validation;
             _generatingService = generatingService;
             _fieldRepository = fieldRepository;
+            _playersRepository = playersRepository;
         }
 
         [HttpGet("{startGame}/{username}")]
         public void GenerateBoards(int startGame, string username)
         {
-            var board1 = new GameCore(10, 10, 12, _validation, _generatingService);
-            var board2 = new GameCore(10, 10, 12, _validation, _generatingService);
+            var player = _playersRepository.GetPlayerByNameAsync(username);
+
+            if (player == null) return;
+
+            var board1 = new GameCore(10, 10, 12, username, _validation, _generatingService);
+            var board2 = new GameCore(10, 10, 12, username, _validation, _generatingService);
 
             foreach (var field in board1.Fields)
             {

@@ -19,6 +19,12 @@ namespace BattleshipGame.API.Services
                 .FirstOrDefaultAsync(i => i.Id == playerId);
         }
 
+        public async Task<Player?> GetPlayerByNameAsync(string username)
+        {
+            return await _context.Players
+                .FirstOrDefaultAsync(p => p.Name == username);
+        }
+
         public async Task<IEnumerable<Player>> GetPlayersAsync()
         {
             return await _context.Players.ToListAsync();
