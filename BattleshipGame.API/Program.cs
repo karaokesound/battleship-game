@@ -32,8 +32,9 @@ var serviceProvider = new ServiceCollection()
                 .AddSingleton<IGeneratingService, GeneratingService>()
                 .BuildServiceProvider();
 
-// Tworzenie obiektu GameSettings i przekazanie wstrzykniêtego IValidationService
-var gameSettings = new GameCore(10, 10, 11,
+// Tworzenie obiektu GameCore
+
+var gameCore = new GameCore(10, 10, 13,
     serviceProvider.GetRequiredService<IValidationService>(),
     serviceProvider.GetRequiredService<IGeneratingService>());
 
