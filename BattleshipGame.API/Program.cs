@@ -34,7 +34,7 @@ var serviceProvider = new ServiceCollection()
 
 // Tworzenie obiektu GameCore
 
-var gameCore = new GameCore(10, 10, 13,
+var gameCore = new GameCore(10, 10, 12,
     serviceProvider.GetRequiredService<IValidationService>(),
     serviceProvider.GetRequiredService<IGeneratingService>());
 

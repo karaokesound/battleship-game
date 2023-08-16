@@ -204,7 +204,7 @@ namespace BattleshipGame.Logic.Logic
                 else if (field.ShipSize == 4) countQuadrupleShips += 1;
             }
 
-            if (countSingleShips != 5 || countDoubleShips != 8 || countTripleShips != 9 || countQuadrupleShips != 4)
+            if (countSingleShips != 5 || countDoubleShips != 8 || countTripleShips != 9)
             {
                 GenerateRandomCoordinates();
                 DisplayShipsCoordinatesAndGameBoard();
