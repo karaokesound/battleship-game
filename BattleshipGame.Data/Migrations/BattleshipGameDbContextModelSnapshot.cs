@@ -22,6 +22,10 @@ namespace BattleshipGame.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Player")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("ShipSize")
                         .HasColumnType("INTEGER");
 

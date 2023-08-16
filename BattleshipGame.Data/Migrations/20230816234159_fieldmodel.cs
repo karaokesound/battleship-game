@@ -34,6 +34,7 @@ namespace BattleshipGame.Data.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    Player = table.Column<string>(type: "TEXT", nullable: false),
                     X = table.Column<int>(type: "INTEGER", nullable: false),
                     Y = table.Column<int>(type: "INTEGER", nullable: false),
                     ShipSize = table.Column<int>(type: "INTEGER", nullable: false)

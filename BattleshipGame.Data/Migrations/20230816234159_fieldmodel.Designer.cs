@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BattleshipGame.Data.Migrations
 {
     [DbContext(typeof(BattleshipGameDbContext))]
-    [Migration("20230816215232_fieldmodel")]
+    [Migration("20230816234159_fieldmodel")]
     partial class fieldmodel
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,6 +23,10 @@ namespace BattleshipGame.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Player")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("ShipSize")
                         .HasColumnType("INTEGER");
