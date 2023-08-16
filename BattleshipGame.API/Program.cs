@@ -27,6 +27,7 @@ builder.Services.AddSingleton<IMessageService, MessageService>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddSingleton<IValidationService, ValidationService>();
 builder.Services.AddSingleton<IGeneratingService, GeneratingService>();
+builder.Services.AddScoped<iFieldRepository, FieldRepository>();
 
 //var serviceProvider = new ServiceCollection()
 //                .AddSingleton<IValidationService, ValidationService>()

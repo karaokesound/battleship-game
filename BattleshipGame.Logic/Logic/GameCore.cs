@@ -11,6 +11,8 @@ namespace BattleshipGame.Logic.Logic
 
         public int YField { get; set; }
 
+        public string Username { get; set; }
+
         public List<Field> Fields { get; set; }
 
         public int NumberOfShips { get; set; }
@@ -22,13 +24,16 @@ namespace BattleshipGame.Logic.Logic
         private readonly IGeneratingService _generatingService;
 
         public GameCore
-            (int xField, int yField, int numberOfShips,
+            (int xField, int yField, 
+            int numberOfShips, 
+            string username,
             IValidationService validation,
             IGeneratingService generatingService)
         {
             XField = xField;
             YField = yField;
             NumberOfShips = numberOfShips;
+            Username = username;
             Fields = new List<Field>();
             ShipList = new List<Ship>();
             _validation = validation;
