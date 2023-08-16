@@ -53,12 +53,47 @@ namespace BattleshipGame.Logic.Services
 
             var invalidFields = new List<Field>();
 
+
             invalidFields = allFields.FindAll(xy =>
-            ((Math.Abs(xy.X - selectedFields[0].X) <= 1 && Math.Abs(xy.Y - selectedFields[0].Y) <= 1) &&
-                xy.X >= 0 && xy.Y >= 0 && xy.X < 10 && xy.Y < 10) ||
-            ((Math.Abs(xy.X - selectedFields[1].X) <= 1 && Math.Abs(xy.Y - selectedFields[1].Y) <= 1) &&
-                xy.X >= 0 && xy.Y >= 0 && xy.X < 10 && xy.Y < 10))
-            .ToList();
+    ((Math.Abs(xy.X - selectedFields[0].X) <= 1 && Math.Abs(xy.Y - selectedFields[0].Y) <= 1) &&
+        xy.X >= 0 && xy.Y >= 0 && xy.X < 10 && xy.Y < 10) ||
+    ((Math.Abs(xy.X - selectedFields[1].X) <= 1 && Math.Abs(xy.Y - selectedFields[1].Y) <= 1) &&
+        xy.X >= 0 && xy.Y >= 0 && xy.X < 10 && xy.Y < 10))
+    .ToList();
+
+            foreach (var field in invalidFields)
+            {
+                field.IsValid = false;
+            }
+
+            return true;
+        }
+
+        public bool ThreeFieldShipValidation(List<Field> selectedFields, List<Field> allFields)
+        {
+            foreach (var field in selectedFields)
+            {
+                if (!field.IsValid || !field.IsEmpty) return false;
+            }
+
+            foreach (var field in selectedFields)
+            {
+                field.IsEmpty = false;
+                field.ShipSize = 3;
+            }
+
+            var invalidFields = new List<Field>();
+
+            invalidFields = allFields.FindAll(xy =>
+     ((Math.Abs(xy.X - selectedFields[0].X) <= 1 && Math.Abs(xy.Y - selectedFields[0].Y) <= 1) &&
+      (xy.X != selectedFields[0].X || xy.Y != selectedFields[0].Y)) ||
+
+     ((Math.Abs(xy.X - selectedFields[1].X) <= 1 && Math.Abs(xy.Y - selectedFields[1].Y) <= 1) &&
+      (xy.X != selectedFields[1].X || xy.Y != selectedFields[1].Y)) ||
+
+     ((Math.Abs(xy.X - selectedFields[2].X) <= 1 && Math.Abs(xy.Y - selectedFields[2].Y) <= 1) &&
+      (xy.X != selectedFields[2].X || xy.Y != selectedFields[2].Y)))
+     .ToList();
 
             foreach (var field in invalidFields)
             {

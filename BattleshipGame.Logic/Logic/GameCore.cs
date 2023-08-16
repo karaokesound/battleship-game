@@ -88,12 +88,12 @@ namespace BattleshipGame.Logic.Logic
         public void GenerateRandomCoordinates()
         {
             Random random = new Random();
+
             foreach (var ship in ShipList)
             {
                 int tryCount = 0;
 
-                // Generates random coordinates and tries to validate it.
-                while (tryCount < 30)
+                while (tryCount < 50)
                 {
                     int startX = random.Next(0, XField);
                     int startY = random.Next(0, XField);
@@ -101,7 +101,8 @@ namespace BattleshipGame.Logic.Logic
                     int endY = 0;
                     int XDirection = random.Next(2) == 0 ? 1 : -1;
                     int YDirection = random.Next(2) == 0 ? 1 : -1;
-                    bool verticalHorizontal = random.Next(2) == 0 ? true : false;
+                    bool verticalHorizontal = random.Next(4) != 0; // 2/3 szansy na pionowy kierunek
+                    int TripleShipDirection = random.Next(2) == 0 ? 1 : -1;
 
                     if (ship.Size == 1)
                     {
@@ -110,51 +111,48 @@ namespace BattleshipGame.Logic.Logic
                             break;
                         }
                         tryCount++;
-                        continue;
                     }
-
-                    if (ship.Size == 2)
+                    else if (ship.Size == 2)
                     {
-
-                        // horizontal
-                        if (XDirection == -1 && startX > 0 && verticalHorizontal)
+                        if (verticalHorizontal)
                         {
-                            endX = startX - 1;
+                            endX = startX + XDirection;
                             endY = startY;
-
-                            if (ValidateFields(ship, startX, startY, endX, endY))
-                            {
-                                break;
-                            }
-                            tryCount++;
-                            continue;
                         }
-
-                        endX = startX + 1;
-                        endY = startY;
+                        else
+                        {
+                            endX = startX;
+                            endY = startY + YDirection;
+                        }
 
                         if (ValidateFields(ship, startX, startY, endX, endY))
                         {
                             break;
                         }
                         tryCount++;
-
-                        // vertical
-                        if (YDirection == -1 && startX > 0 && !verticalHorizontal)
+                    }
+                    else if (ship.Size == 3)
+                    {
+                        if (!verticalHorizontal && TripleShipDirection == 1)
+                        {
+                            endX = startX + XDirection * 2;
+                            endY = startY;
+                        }
+                        else if (!verticalHorizontal && TripleShipDirection == -1)
+                        {
+                            endX = startX + XDirection;
+                            endY = startY + YDirection;
+                        }
+                        else if (verticalHorizontal && TripleShipDirection == 1)
                         {
                             endX = startX;
-                            endY = startY - 1;
-
-                            if (ValidateFields(ship, startX, startY, endX, endY))
-                            {
-                                break;
-                            }
-                            tryCount++;
-                            continue;
+                            endY = startY + YDirection * 2;
                         }
-
-                        endX = startX;
-                        endY = startY + 1;
+                        else if (verticalHorizontal && TripleShipDirection == -1)
+                        {
+                            endX = startX + XDirection;
+                            endY = startY + YDirection;
+                        }
 
                         if (ValidateFields(ship, startX, startY, endX, endY))
                         {
@@ -166,6 +164,8 @@ namespace BattleshipGame.Logic.Logic
             }
         }
 
+
+
         public bool ValidateFields(Ship ship, int startX, int startY, int endX, int endY)
         {
             if (ship.Size == 1)
@@ -173,15 +173,30 @@ namespace BattleshipGame.Logic.Logic
                 var selectedField = Fields.FirstOrDefault(xy => xy.X == startX && xy.Y == startY);
 
                 return _validation.OneFieldShipValidation(selectedField, Fields);
-
             }
 
             if (ship.Size == 2)
             {
-                var selectedFields = Fields.FindAll(f => f.X == startX && f.Y == startY || f.X == endX && f.Y == endY)
+                var selectedFields = Fields.FindAll(f => f.X == startX && f.Y == startY
+                || f.X == endX && f.Y == endY)
                     .ToList();
 
+                if (selectedFields.Count != 2) return false;
+
                 return _validation.TwoFieldShipValidation(selectedFields, Fields);
+            }
+
+            if (ship.Size == 3)
+            {
+                var selectedFields = Fields.FindAll(f => (f.X == startX && f.Y == startY)
+                || f.X == endX && f.Y == endY
+                || f.X == ((startX + endX) / 2) && f.Y == endY
+                || f.Y == ((startY + endY) / 2) && f.X == endX)
+                    .ToList();
+
+                if (selectedFields.Count != 3) return false;
+
+                return _validation.ThreeFieldShipValidation(selectedFields, Fields);
             }
 
             return false;
@@ -189,6 +204,23 @@ namespace BattleshipGame.Logic.Logic
 
         public void DisplayShipsCoordinatesAndGameBoard()
         {
+            int countSingle = 0;
+            int countDouble = 0;
+            int countTriple = 0;
+
+            foreach (var vfield in Fields)
+            {
+                if (vfield.ShipSize == 1) countSingle += 1;
+                else if (vfield.ShipSize == 2) countDouble += 1;
+                else if (vfield.ShipSize == 3) countTriple += 1;
+            }
+
+            if (countSingle != 5 || countDouble != 8 || countTriple != 9)
+            {
+                GenerateRandomCoordinates();
+                DisplayShipsCoordinatesAndGameBoard();
+            }
+
             int shipCounter = 0;
 
             foreach (var field in Fields)
@@ -219,6 +251,20 @@ namespace BattleshipGame.Logic.Logic
                 }
             }
 
+            foreach (var field in Fields)
+            {
+                if (field.IsEmpty)
+                {
+                    continue;
+                }
+
+                if (!field.IsEmpty && field.ShipSize == 3)
+                {
+                    Console.WriteLine($"3-field ship {shipCounter} coordinates (X, Y): {field.X}, {field.Y}");
+                    shipCounter++;
+                }
+            }
+
             Console.WriteLine();
 
             for (int y = 0; y < YField; y++)
@@ -229,11 +275,19 @@ namespace BattleshipGame.Logic.Logic
 
                     if (field != null && !field.IsEmpty)
                     {
+                        Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                        Console.BackgroundColor = ConsoleColor.DarkYellow;
                         Console.Write("1 ");
+                        Console.ResetColor();
+                        Console.BackgroundColor = ConsoleColor.Black;
+                    }
+                    else if (field.IsEmpty && field.IsValid)
+                    {
+                        Console.Write("0 ");
                     }
                     else
                     {
-                        Console.Write("0 ");
+                        Console.Write("$ ");
                     }
                 }
                 Console.WriteLine();

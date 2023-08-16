@@ -7,5 +7,7 @@ namespace BattleshipGame.Logic.Services
         bool OneFieldShipValidation(Field selectedField, List<Field> allFields);
 
         bool TwoFieldShipValidation(List<Field> selectedFields, List<Field> allFields);
+
+        bool ThreeFieldShipValidation(List<Field> selectedFields, List<Field> allFields);
     }
 }
