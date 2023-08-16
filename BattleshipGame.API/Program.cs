@@ -28,11 +28,14 @@ builder.Services.AddSingleton<IMessageService, MessageService>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var serviceProvider = new ServiceCollection()
-                .AddScoped<IValidationService, ValidationService>()
+                .AddSingleton<IValidationService, ValidationService>()
+                .AddSingleton<IGeneratingService, GeneratingService>()
                 .BuildServiceProvider();
 
 // Tworzenie obiektu GameSettings i przekazanie wstrzykniêtego IValidationService
-var gameSettings = new GameCore(10, 10, 11, serviceProvider.GetRequiredService<IValidationService>());
+var gameSettings = new GameCore(10, 10, 11,
+    serviceProvider.GetRequiredService<IValidationService>(),
+    serviceProvider.GetRequiredService<IGeneratingService>());
 
 var app = builder.Build();
 

@@ -4,8 +4,10 @@ namespace BattleshipGame.Logic.Services
 {
     public class ValidationService : IValidationService
     {
-        public bool OneFieldShipValidation(Field selectedField, List<Field> allFields)
+        public bool OneFieldShipValidation(int startX, int startY, int endX, int endY, List<Field> allFields)
         {
+            var selectedField = allFields.FirstOrDefault(xy => xy.X == startX && xy.Y == startY);
+
             if (!selectedField.IsEmpty || !selectedField.IsValid)
             {
                 return false;
@@ -36,8 +38,14 @@ namespace BattleshipGame.Logic.Services
             return true;
         }
 
-        public bool TwoFieldShipValidation(List<Field> selectedFields, List<Field> allFields)
+        public bool TwoFieldShipValidation(int startX, int startY, int endX, int endY, List<Field> allFields)
         {
+            var selectedFields = allFields.FindAll(f => f.X == startX && f.Y == startY
+               || f.X == endX && f.Y == endY)
+                   .ToList();
+
+            if (selectedFields.Count != 2) return false;
+
             foreach (var field in selectedFields)
             {
                 if (!field.IsValid || !field.IsEmpty) return false;
@@ -52,7 +60,6 @@ namespace BattleshipGame.Logic.Services
             // Finds invalid fields and adjusts IsValid property to false.
 
             var invalidFields = new List<Field>();
-
 
             invalidFields = allFields.FindAll(xy =>
     ((Math.Abs(xy.X - selectedFields[0].X) <= 1 && Math.Abs(xy.Y - selectedFields[0].Y) <= 1) &&
@@ -69,8 +76,16 @@ namespace BattleshipGame.Logic.Services
             return true;
         }
 
-        public bool ThreeFieldShipValidation(List<Field> selectedFields, List<Field> allFields)
+        public bool ThreeFieldShipValidation(int startX, int startY, int endX, int endY, List<Field> allFields)
         {
+            var selectedFields = allFields.FindAll(f => (f.X == startX && f.Y == startY)
+                || f.X == endX && f.Y == endY
+                || f.X == ((startX + endX) / 2) && f.Y == endY
+                || f.Y == ((startY + endY) / 2) && f.X == endX)
+                    .ToList();
+
+            if (selectedFields.Count != 3) return false;
+
             foreach (var field in selectedFields)
             {
                 if (!field.IsValid || !field.IsEmpty) return false;

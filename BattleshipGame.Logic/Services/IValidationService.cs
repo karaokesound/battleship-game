@@ -4,10 +4,10 @@ namespace BattleshipGame.Logic.Services
 {
     public interface IValidationService
     {
-        bool OneFieldShipValidation(Field selectedField, List<Field> allFields);
+        bool OneFieldShipValidation(int startX, int startY, int endX, int endY, List<Field> allFields);
 
-        bool TwoFieldShipValidation(List<Field> selectedFields, List<Field> allFields);
+        bool TwoFieldShipValidation(int startX, int startY, int endX, int endY, List<Field> allFields);
 
-        bool ThreeFieldShipValidation(List<Field> selectedFields, List<Field> allFields);
+        bool ThreeFieldShipValidation(int startX, int startY, int endX, int endY, List<Field> allFields);
     }
 }
