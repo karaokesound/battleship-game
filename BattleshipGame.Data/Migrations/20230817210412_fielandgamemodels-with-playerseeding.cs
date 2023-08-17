@@ -4,43 +4,10 @@
 
 namespace BattleshipGame.Data.Migrations
 {
-    public partial class gamemodel : Migration
+    public partial class fielandgamemodelswithplayerseeding : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "GameEntityId",
-                table: "Fields",
-                type: "INTEGER",
-                nullable: true);
-
-            migrationBuilder.AddColumn<int>(
-                name: "GameEntityId1",
-                table: "Fields",
-                type: "INTEGER",
-                nullable: true);
-
-            migrationBuilder.AddColumn<bool>(
-                name: "IsEmpty",
-                table: "Fields",
-                type: "INTEGER",
-                nullable: false,
-                defaultValue: false);
-
-            migrationBuilder.AddColumn<bool>(
-                name: "IsHitted",
-                table: "Fields",
-                type: "INTEGER",
-                nullable: false,
-                defaultValue: false);
-
-            migrationBuilder.AddColumn<bool>(
-                name: "IsValid",
-                table: "Fields",
-                type: "INTEGER",
-                nullable: false,
-                defaultValue: false);
-
             migrationBuilder.CreateTable(
                 name: "Games",
                 columns: table => new
@@ -65,6 +32,37 @@ namespace BattleshipGame.Data.Migrations
                         principalTable: "Players",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Fields",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Player = table.Column<string>(type: "TEXT", nullable: false),
+                    X = table.Column<int>(type: "INTEGER", nullable: false),
+                    Y = table.Column<int>(type: "INTEGER", nullable: false),
+                    ShipSize = table.Column<int>(type: "INTEGER", nullable: false),
+                    IsEmpty = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsHitted = table.Column<bool>(type: "INTEGER", nullable: false),
+                    IsValid = table.Column<bool>(type: "INTEGER", nullable: false),
+                    GameEntityId = table.Column<int>(type: "INTEGER", nullable: true),
+                    GameEntityId1 = table.Column<int>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Fields", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Fields_Games_GameEntityId",
+                        column: x => x.GameEntityId,
+                        principalTable: "Games",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Fields_Games_GameEntityId1",
+                        column: x => x.GameEntityId1,
+                        principalTable: "Games",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.InsertData(
@@ -111,42 +109,15 @@ namespace BattleshipGame.Data.Migrations
                 name: "IX_Games_Player2Id",
                 table: "Games",
                 column: "Player2Id");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Fields_Games_GameEntityId",
-                table: "Fields",
-                column: "GameEntityId",
-                principalTable: "Games",
-                principalColumn: "Id");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Fields_Games_GameEntityId1",
-                table: "Fields",
-                column: "GameEntityId1",
-                principalTable: "Games",
-                principalColumn: "Id");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Fields_Games_GameEntityId",
-                table: "Fields");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Fields_Games_GameEntityId1",
-                table: "Fields");
+            migrationBuilder.DropTable(
+                name: "Fields");
 
             migrationBuilder.DropTable(
                 name: "Games");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Fields_GameEntityId",
-                table: "Fields");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Fields_GameEntityId1",
-                table: "Fields");
 
             migrationBuilder.DeleteData(
                 table: "Players",
@@ -172,26 +143,6 @@ namespace BattleshipGame.Data.Migrations
                 table: "Players",
                 keyColumn: "Id",
                 keyValue: 5);
-
-            migrationBuilder.DropColumn(
-                name: "GameEntityId",
-                table: "Fields");
-
-            migrationBuilder.DropColumn(
-                name: "GameEntityId1",
-                table: "Fields");
-
-            migrationBuilder.DropColumn(
-                name: "IsEmpty",
-                table: "Fields");
-
-            migrationBuilder.DropColumn(
-                name: "IsHitted",
-                table: "Fields");
-
-            migrationBuilder.DropColumn(
-                name: "IsValid",
-                table: "Fields");
         }
     }
 }

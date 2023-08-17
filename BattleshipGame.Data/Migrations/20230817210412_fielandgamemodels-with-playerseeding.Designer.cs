@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BattleshipGame.Data.Migrations
 {
     [DbContext(typeof(BattleshipGameDbContext))]
-    [Migration("20230817185342_gamemodel")]
-    partial class gamemodel
+    [Migration("20230817210412_fielandgamemodels-with-playerseeding")]
+    partial class fielandgamemodelswithplayerseeding
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
