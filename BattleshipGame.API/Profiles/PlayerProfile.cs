@@ -8,11 +8,11 @@ namespace BattleshipGame.API.Profiles
     {
         public PlayerProfile()
         {
-            CreateMap<Player, PlayerDto>();
-            CreateMap<PlayerForCreationDto, Player>();
+            CreateMap<PlayerEntity, PlayerDto>();
+            CreateMap<PlayerForCreationDto, PlayerEntity>();
             CreateMap<PlayerForCreationDto, PlayerDto>();
-            CreateMap<PlayerForUpdateDto, Player>();
-            CreateMap<Player, PlayerForUpdateDto>();
+            CreateMap<PlayerForUpdateDto, PlayerEntity>();
+            CreateMap<PlayerEntity, PlayerForUpdateDto>();
         }
     }
 }

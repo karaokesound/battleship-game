@@ -1,6 +1,6 @@
 ﻿namespace BattleshipGame.Data.Entities
 {
-    public class Player
+    public class PlayerEntity
     {
         public int Id { get; set; }
         
@@ -8,7 +8,7 @@
 
         public string City { get; set; }
 
-        public Player(string name, string city)
+        public PlayerEntity(string name, string city)
         {
             Name = name;
             City = city;

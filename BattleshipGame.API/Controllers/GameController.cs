@@ -1,4 +1,6 @@
-﻿using BattleshipGame.API.Services;
+﻿using AutoMapper;
+using BattleshipGame.API.Models.Game;
+using BattleshipGame.API.Services;
 using BattleshipGame.Data.Entities;
 using BattleshipGame.Logic.Logic;
 using BattleshipGame.Logic.Services;
@@ -18,15 +20,19 @@ namespace BattleshipGame.API.Controllers
 
         private readonly IPlayersRepository _playersRepository;
 
+        private readonly IMapper _mapper;
+
         public GameController(IValidationService validation,
             IGeneratingService generatingService,
             iFieldRepository fieldRepository,
-            IPlayersRepository playersRepository)
+            IPlayersRepository playersRepository,
+            IMapper mapper)
         {
             _validation = validation;
             _generatingService = generatingService;
             _fieldRepository = fieldRepository;
             _playersRepository = playersRepository;
+            _mapper = mapper;
         }
 
         [HttpPost("{startGame}/{playerOneName}")]
@@ -39,7 +45,7 @@ namespace BattleshipGame.API.Controllers
             _fieldRepository.DeleteAllFields();
             await _fieldRepository.SaveChangesAsync();
 
-            Player? player2 = await _playersRepository.GetRandomPlayerAsync(playerOneName);
+            PlayerEntity? player2 = await _playersRepository.GetRandomPlayerAsync(playerOneName);
             if (player2 == null) return NotFound();
 
             // Create game boards and add them to the database
@@ -63,10 +69,19 @@ namespace BattleshipGame.API.Controllers
             return Ok();
         }
 
-        [HttpGet]
-        public async Task<ActionResult> DisplayGameBoards()
+        [HttpGet("{playerName}")]
+        public async Task<ActionResult> DisplayGameBoard(string playerName)
         {
+            if (playerName == null) return NotFound();
 
+            var playerFields = await _fieldRepository.GetPlayerFieldsAsync(playerName);
+
+            var nonEmptyFields = playerFields.Where(f => f.IsEmpty == false);
+            int counter = nonEmptyFields.Count();
+
+            var mappedPlayerFields = _mapper.Map<List<Field>>(playerFields);
+
+            return Ok(_generatingService.GenerateGameBoard(mappedPlayerFields, 10, 10));
         }
     }
 }

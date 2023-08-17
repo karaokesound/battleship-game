@@ -13,12 +13,14 @@ namespace BattleshipGame.API.Services
             _context = context;
         }
 
-        public async Task<Field?> GetFieldAsync(int x, int y)
+        public async Task<List<FieldEntity>> GetPlayerFieldsAsync(string player)
         {
-            return await _context.Fields.FirstOrDefaultAsync(xy => xy.X == x && xy.Y == y);
+            return await _context.Fields
+                .Where(f => f.Player == player)
+                .ToListAsync();
         }
 
-        public async Task<IEnumerable<Field>> GetFieldsAsync()
+        public async Task<IEnumerable<FieldEntity>> GetFieldsAsync()
         {
             return await _context.Fields.ToListAsync();
         }
@@ -30,7 +32,7 @@ namespace BattleshipGame.API.Services
             if (field != null) return false;
 
             _context.Fields.Add(
-                new Field()
+                new FieldEntity()
                 {
                     X = x,
                     Y = y,
@@ -46,7 +48,7 @@ namespace BattleshipGame.API.Services
 
         public void DeleteAllFields()
         {
-            List<Field> allFields = _context.Fields.ToList();
+            List<FieldEntity> allFields = _context.Fields.ToList();
             
             foreach (var field in allFields)
             {
