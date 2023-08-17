@@ -6,7 +6,7 @@ namespace BattleshipGame.API.Services
     {
         Task<List<FieldEntity>> GetPlayerFieldsAsync(string player);
 
-        Task<IEnumerable<FieldEntity>> GetFieldsAsync();
+        Task<List<string>> GetCurrentPlayersByFieldsAsync();
 
         Task<bool> AddFieldAsync(int x, int y, int shipSize, bool isEmpty, bool isHitted, bool isValid, string player);
 

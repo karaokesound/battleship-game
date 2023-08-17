@@ -20,9 +20,12 @@ namespace BattleshipGame.API.Services
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<FieldEntity>> GetFieldsAsync()
+        public async Task<List<string>> GetCurrentPlayersByFieldsAsync()
         {
-            return await _context.Fields.ToListAsync();
+            return await _context.Fields
+                .Select(p => p.Player)
+                .Distinct()
+                .ToListAsync();
         }
 
         public async Task<bool> AddFieldAsync(int x, int y, int shipSize, bool isEmpty, bool isHitted, bool isValid, string player)

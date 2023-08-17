@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BattleshipGame.API.Models.Game;
+using BattleshipGame.API.Models.Player;
 using BattleshipGame.API.Services;
 using BattleshipGame.Data.Entities;
 using BattleshipGame.Logic.Logic;
@@ -36,7 +37,7 @@ namespace BattleshipGame.API.Controllers
         }
 
         [HttpPost("{startGame}/{playerOneName}")]
-        public async Task<ActionResult> GenerateBoards(int startGame, string playerOneName)
+        public async Task<ActionResult> GenerateBoards(int startGame, string playerName)
         {
             // Method firstly checks if any fields are generated from previous games. If yes, it deletes all fields.
             // Then player 2 is randomly searched from database and two game boards are created and added to the database
@@ -45,18 +46,18 @@ namespace BattleshipGame.API.Controllers
             _fieldRepository.DeleteAllFields();
             await _fieldRepository.SaveChangesAsync();
 
-            PlayerEntity? player2 = await _playersRepository.GetRandomPlayerAsync(playerOneName);
+            PlayerEntity? player2 = await _playersRepository.GetRandomPlayerAsync(playerName);
             if (player2 == null) return NotFound();
 
             // Create game boards and add them to the database
 
-            var board1 = new GameCore(10, 10, 12, playerOneName, _validation, _generatingService);
+            var board1 = new GameCore(10, 10, 12, playerName, _validation, _generatingService);
             var board2 = new GameCore(10, 10, 12, player2.Name, _validation, _generatingService);
 
             foreach (var field in board1.Fields)
             {
                await _fieldRepository.AddFieldAsync(field.X, field.Y, field.ShipSize, field.IsEmpty, field.IsHitted, field.IsValid,
-                    playerOneName);
+                    playerName);
             }
 
             foreach (var field in board2.Fields)
@@ -72,12 +73,16 @@ namespace BattleshipGame.API.Controllers
         [HttpGet("{playerName}")]
         public async Task<ActionResult> DisplayGameBoard(string playerName)
         {
-            if (playerName == null) return NotFound();
+            // This method firstly check nicknames of two players who are actually playing and
+            // returns game board of player who nickname is inputted.
+
+            List<string> currPlayersName = await _fieldRepository.GetCurrentPlayersByFieldsAsync();
+
+            if (playerName == null || (playerName != currPlayersName[0] && playerName != currPlayersName[1])) return NotFound();
 
             var playerFields = await _fieldRepository.GetPlayerFieldsAsync(playerName);
 
-            var nonEmptyFields = playerFields.Where(f => f.IsEmpty == false);
-            int counter = nonEmptyFields.Count();
+            // Mapping entities to game models
 
             var mappedPlayerFields = _mapper.Map<List<Field>>(playerFields);
 
