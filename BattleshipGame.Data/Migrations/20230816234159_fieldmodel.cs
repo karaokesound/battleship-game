@@ -29,20 +29,23 @@ namespace BattleshipGame.Data.Migrations
                 keyValue: 4);
 
             migrationBuilder.CreateTable(
-                name: "Fields",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Player = table.Column<string>(type: "TEXT", nullable: false),
-                    X = table.Column<int>(type: "INTEGER", nullable: false),
-                    Y = table.Column<int>(type: "INTEGER", nullable: false),
-                    ShipSize = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Fields", x => x.Id);
-                });
+    name: "Fields",
+    columns: table => new
+    {
+        Id = table.Column<int>(type: "INTEGER", nullable: false)
+            .Annotation("Sqlite:Autoincrement", true),
+        Player = table.Column<string>(type: "TEXT", nullable: false),
+        X = table.Column<int>(type: "INTEGER", nullable: false),
+        Y = table.Column<int>(type: "INTEGER", nullable: false),
+        ShipSize = table.Column<int>(type: "INTEGER", nullable: false),
+        IsEmpty = table.Column<bool>(type: "INTEGER", nullable: false),
+        IsHitted = table.Column<bool>(type: "INTEGER", nullable: false),
+        IsValid = table.Column<bool>(type: "INTEGER", nullable: false)
+    },
+    constraints: table =>
+    {
+        table.PrimaryKey("PK_Fields", x => x.Id);
+    });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
