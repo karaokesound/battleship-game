@@ -8,9 +8,9 @@ namespace BattleshipGame.API.Services
 
         Task<IEnumerable<Field>> GetFieldsAsync();
 
-        Task<bool> AddFieldAsync(int x, int y, int shipSize, bool isEmpty, bool isHitted, bool isValid);
+        Task<bool> AddFieldAsync(int x, int y, int shipSize, bool isEmpty, bool isHitted, bool isValid, string player);
 
-        void DeleteField(Field field);
+        void DeleteAllFields();
 
         Task<bool> SaveChangesAsync();
     }

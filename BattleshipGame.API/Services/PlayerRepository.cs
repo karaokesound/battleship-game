@@ -25,6 +25,32 @@ namespace BattleshipGame.API.Services
                 .FirstOrDefaultAsync(p => p.Name == username);
         }
 
+        public async Task<Player?> GetRandomPlayerAsync(string player1)
+        {
+            Player? firstPlayer = _context.Players.FirstOrDefault(p => p.Name == player1);
+
+            List<int> playersIds = await _context.Players
+                .Select(p => p.Id)
+                .ToListAsync();
+
+            if (playersIds == null || playersIds.Count == 0) return null;
+
+            int minId = playersIds.Min();
+            int maxId = playersIds.Max();
+
+            Random random = new Random();
+            int randomId;
+
+            do
+            {
+                randomId = random.Next(minId, maxId);
+            }
+            while (randomId == firstPlayer.Id);
+
+            return await _context.Players
+            .FirstOrDefaultAsync(p => p.Id == randomId);
+        }
+
         public async Task<IEnumerable<Player>> GetPlayersAsync()
         {
             return await _context.Players.ToListAsync();
@@ -35,7 +61,7 @@ namespace BattleshipGame.API.Services
             var doesPlayerNameExist = await _context.Players
                 .AnyAsync(n => n.Name == player.Name);
 
-            if (doesPlayerNameExist || player == null) return false; 
+            if (doesPlayerNameExist || player == null) return false;
 
             _context.Players.Add(player);
             return true;

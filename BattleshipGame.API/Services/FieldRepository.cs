@@ -23,7 +23,7 @@ namespace BattleshipGame.API.Services
             return await _context.Fields.ToListAsync();
         }
 
-        public async Task<bool> AddFieldAsync(int x, int y, int shipSize, bool isEmpty, bool isHitted, bool isValid)
+        public async Task<bool> AddFieldAsync(int x, int y, int shipSize, bool isEmpty, bool isHitted, bool isValid, string player)
         {
             var field = await _context.Fields.FirstOrDefaultAsync(f => f.X == x && f.Y == y);
 
@@ -38,14 +38,20 @@ namespace BattleshipGame.API.Services
                     IsEmpty = isEmpty,
                     IsHitted = isHitted,
                     IsValid = isValid,
+                    Player = player,
                 });
 
             return true;
         }
 
-        public void DeleteField(Field field)
+        public void DeleteAllFields()
         {
-            _context.Fields.Remove(field);
+            List<Field> allFields = _context.Fields.ToList();
+            
+            foreach (var field in allFields)
+            {
+                _context.Remove(field);
+            }
         }
 
         public async Task<bool> SaveChangesAsync()

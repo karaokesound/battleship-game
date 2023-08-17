@@ -1,12 +1,11 @@
 ﻿using BattleshipGame.API.Models.Game;
-using BattleshipGame.Logic.Models.Game;
 using System.Text;
 
 namespace BattleshipGame.Logic.Services
 {
     public class GeneratingService : IGeneratingService
     {
-        public List<Field> GenerateFields(int XFields, int YFields)
+        public List<Field> GenerateFields(int XFields, int YFields, string player)
         {
             List<Field> fieldsList = new List<Field>();
 
@@ -14,7 +13,7 @@ namespace BattleshipGame.Logic.Services
             {
                 for (int y = 0; y < YFields; y++)
                 {
-                    fieldsList.Add(new Field(x, y));
+                    fieldsList.Add(new Field(x, y, player));
                 }
             }
 

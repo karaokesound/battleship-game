@@ -8,6 +8,8 @@ namespace BattleshipGame.API.Services
 
         Task<Player> GetPlayerByNameAsync(string username);
 
+        Task<Player?> GetRandomPlayerAsync(string player1);
+
         Task<IEnumerable<Player>> GetPlayersAsync();
 
         Task<bool> CreatePlayerAsync(Player player);
