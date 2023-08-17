@@ -29,7 +29,7 @@ namespace BattleshipGame.API.Controllers
             _playersRepository = playersRepository;
         }
 
-        [HttpGet("{startGame}/{playerOneName}")]
+        [HttpPost("{startGame}/{playerOneName}")]
         public async Task<ActionResult> GenerateBoards(int startGame, string playerOneName)
         {
             // Method firstly checks if any fields are generated from previous games. If yes, it deletes all fields.
@@ -63,9 +63,10 @@ namespace BattleshipGame.API.Controllers
             return Ok();
         }
 
-        //[HttpGet]
-        //public async Task<ActionResult> DisplayGameBoards()
-        //{
-        //}
+        [HttpGet]
+        public async Task<ActionResult> DisplayGameBoards()
+        {
+
+        }
     }
 }
