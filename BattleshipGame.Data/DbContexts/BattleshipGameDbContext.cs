@@ -14,5 +14,32 @@ namespace BattleshipGame.Data.DbContexts
         {
             
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Player>().HasData(
+                new Player("Player1", "City1")
+                {
+                    Id = 1
+                },
+                new Player("Player2", "City2")
+                {
+                    Id = 2
+                },
+                new Player("Player3", "City3")
+                {
+                    Id = 3
+                },
+                new Player("Player4", "City4")
+                {
+                    Id = 4
+                },
+                new Player("Player5", "City5")
+                {
+                    Id = 5
+                });
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }
