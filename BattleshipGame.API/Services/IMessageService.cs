@@ -7,5 +7,7 @@
         string UserCreatingError();
 
         string Delete();
+
+        string GameBoardNotFound();
     }
 }

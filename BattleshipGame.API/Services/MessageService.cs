@@ -24,5 +24,13 @@
             return message;
         }
 
+        public string GameBoardNotFound()
+        {
+            string message = "Sorry! Game board for this player name wasn't found. Check if you've passed correct player" +
+                " and try again.";
+
+            return message;
+        }
+
     }
 }

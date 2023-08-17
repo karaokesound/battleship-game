@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using BattleshipGame.API.Models.Game;
-using BattleshipGame.API.Models.Player;
 using BattleshipGame.API.Services;
 using BattleshipGame.Data.Entities;
 using BattleshipGame.Logic.Logic;
@@ -23,20 +22,24 @@ namespace BattleshipGame.API.Controllers
 
         private readonly IMapper _mapper;
 
+        private readonly IMessageService _message;
+
         public GameController(IValidationService validation,
             IGeneratingService generatingService,
             iFieldRepository fieldRepository,
             IPlayersRepository playersRepository,
-            IMapper mapper)
+            IMapper mapper,
+            IMessageService message)
         {
             _validation = validation;
             _generatingService = generatingService;
             _fieldRepository = fieldRepository;
             _playersRepository = playersRepository;
             _mapper = mapper;
+            _message = message;
         }
 
-        [HttpPost("{startGame}/{playerOneName}")]
+        [HttpPost("{startGame}/{playerName}")]
         public async Task<ActionResult> GenerateBoards(int startGame, string playerName)
         {
             // Method firstly checks if any fields are generated from previous games. If yes, it deletes all fields.
@@ -78,7 +81,10 @@ namespace BattleshipGame.API.Controllers
 
             List<string> currPlayersName = await _fieldRepository.GetCurrentPlayersByFieldsAsync();
 
-            if (playerName == null || (playerName != currPlayersName[0] && playerName != currPlayersName[1])) return NotFound();
+            if (playerName == null || (playerName != currPlayersName[0] && playerName != currPlayersName[1]))
+            {
+                return NotFound(_message.GameBoardNotFound());
+            }
 
             var playerFields = await _fieldRepository.GetPlayerFieldsAsync(playerName);
 
@@ -88,5 +94,7 @@ namespace BattleshipGame.API.Controllers
 
             return Ok(_generatingService.GenerateGameBoard(mappedPlayerFields, 10, 10));
         }
+
+
     }
 }

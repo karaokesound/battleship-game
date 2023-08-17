@@ -1,6 +1,8 @@
-﻿namespace BattleshipGame.API.Models.Game
+﻿using BattleshipGame.API.Models.Game;
+
+namespace BattleshipGame.Logic.Models.Game
 {
-    public class GameDto
+    public class Game
     {
         public string Player1 { get; set; } = null!;
 
@@ -10,7 +12,7 @@
 
         public List<Field>? Player2Board { get; set; }
 
-        public GameDto()
+        public Game()
         {
             Player1Board = new List<Field>();
             Player2Board = new List<Field>();
