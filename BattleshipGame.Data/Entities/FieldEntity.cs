@@ -1,6 +1,6 @@
 ﻿namespace BattleshipGame.Data.Entities
 {
-    public class Field
+    public class FieldEntity
     {
         public int Id { get; set; }
 

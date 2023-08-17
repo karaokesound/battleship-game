@@ -5,9 +5,9 @@ namespace BattleshipGame.Data.DbContexts
 {
     public class BattleshipGameDbContext : DbContext
     {
-        public DbSet<Player> Players { get; set; } = null!;
+        public DbSet<PlayerEntity> Players { get; set; } = null!;
 
-        public DbSet<Field> Fields { get; set; } = null!;
+        public DbSet<FieldEntity> Fields { get; set; } = null!;
 
         public BattleshipGameDbContext(DbContextOptions<BattleshipGameDbContext> options)
             : base(options)
@@ -17,24 +17,24 @@ namespace BattleshipGame.Data.DbContexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Player>().HasData(
-                new Player("Player1", "City1")
+            modelBuilder.Entity<PlayerEntity>().HasData(
+                new PlayerEntity("Player1", "City1")
                 {
                     Id = 1
                 },
-                new Player("Player2", "City2")
+                new PlayerEntity("Player2", "City2")
                 {
                     Id = 2
                 },
-                new Player("Player3", "City3")
+                new PlayerEntity("Player3", "City3")
                 {
                     Id = 3
                 },
-                new Player("Player4", "City4")
+                new PlayerEntity("Player4", "City4")
                 {
                     Id = 4
                 },
-                new Player("Player5", "City5")
+                new PlayerEntity("Player5", "City5")
                 {
                     Id = 5
                 });

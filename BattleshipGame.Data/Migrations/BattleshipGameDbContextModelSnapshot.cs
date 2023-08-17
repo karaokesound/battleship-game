@@ -22,15 +22,6 @@ namespace BattleshipGame.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsEmpty")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("IsHitted")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("IsValid")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Player")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -46,7 +37,7 @@ namespace BattleshipGame.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Fields");
+                    b.ToTable("Fields", (string)null);
                 });
 
             modelBuilder.Entity("BattleshipGame.Data.Entities.Player", b =>
@@ -65,39 +56,7 @@ namespace BattleshipGame.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Players");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            City = "City1",
-                            Name = "Player1"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            City = "City2",
-                            Name = "Player2"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            City = "City3",
-                            Name = "Player3"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            City = "City4",
-                            Name = "Player4"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            City = "City5",
-                            Name = "Player5"
-                        });
+                    b.ToTable("Players", (string)null);
                 });
 #pragma warning restore 612, 618
         }

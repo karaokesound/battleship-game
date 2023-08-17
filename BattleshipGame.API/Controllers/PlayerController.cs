@@ -57,7 +57,7 @@ namespace BattleshipGame.API.Controllers
         [HttpPost]
         public async Task<ActionResult<PlayerDto>> CreatePlayer(PlayerForCreationDto playerForCreation)
         {
-            var newPlayer = _mapper.Map<Player>(playerForCreation);
+            var newPlayer = _mapper.Map<PlayerEntity>(playerForCreation);
 
             var result = await _playersRepository.CreatePlayerAsync(newPlayer);
 

@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace BattleshipGame.Data.Configuration
 {
-    public class PlayerConfiguration : IEntityTypeConfiguration<Player>
+    public class PlayerConfiguration : IEntityTypeConfiguration<PlayerEntity>
     {
-        public void Configure(EntityTypeBuilder<Player> builder)
+        public void Configure(EntityTypeBuilder<PlayerEntity> builder)
         {
             builder.HasKey(p => p.Id);
             builder.Property(p => p.Name)

@@ -13,18 +13,18 @@ namespace BattleshipGame.API.Services
             _context = context;
         }
 
-        public async Task<Player?> GetPlayerAsync(int playerId)
+        public async Task<PlayerEntity?> GetPlayerAsync(int playerId)
         {
             return await _context.Players
                 .FirstOrDefaultAsync(i => i.Id == playerId);
         }
 
-        public async Task<IEnumerable<Player>> GetPlayersAsync()
+        public async Task<IEnumerable<PlayerEntity>> GetPlayersAsync()
         {
             return await _context.Players.ToListAsync();
         }
 
-        public async Task<bool> CreatePlayerAsync(Player player)
+        public async Task<bool> CreatePlayerAsync(PlayerEntity player)
         {
             var doesPlayerNameExist = await _context.Players
                 .AnyAsync(n => n.Name == player.Name);
@@ -35,7 +35,7 @@ namespace BattleshipGame.API.Services
             return true;
         }
 
-        public void DeletePlayer(Player player)
+        public void DeletePlayer(PlayerEntity player)
         {
             _context.Players.Remove(player);
         }
