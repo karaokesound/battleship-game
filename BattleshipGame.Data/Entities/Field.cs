@@ -12,10 +12,10 @@
 
         public int ShipSize { get; set; }
 
-        public bool IsEmpty;
+        public bool IsEmpty { get; set; }
 
-        public bool IsHitted;
+        public bool IsHitted { get; set; }
 
-        public bool IsValid;
+        public bool IsValid { get; set; }
     }
 }

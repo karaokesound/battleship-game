@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BattleshipGame.Data.Migrations
 {
     [DbContext(typeof(BattleshipGameDbContext))]
-    [Migration("20230817133733_playerseeding")]
-    partial class playerseeding
+    [Migration("20230817140915_addedmissing[getset]")]
+    partial class addedmissinggetset
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -22,6 +22,15 @@ namespace BattleshipGame.Data.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsEmpty")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsHitted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsValid")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Player")

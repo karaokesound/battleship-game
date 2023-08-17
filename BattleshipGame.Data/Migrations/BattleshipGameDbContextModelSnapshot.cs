@@ -22,6 +22,15 @@ namespace BattleshipGame.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("IsEmpty")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsHitted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsValid")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Player")
                         .IsRequired()
                         .HasColumnType("TEXT");
