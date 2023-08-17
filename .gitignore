@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 /BattleshipGame.API/BattleshipGame.db
 /.gitignore
+/BattleshipGame.API/BattleshipGame.db-shm
+/BattleshipGame.API/BattleshipGame.db-wal
