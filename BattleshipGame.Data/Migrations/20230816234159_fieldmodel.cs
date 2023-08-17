@@ -37,10 +37,7 @@ namespace BattleshipGame.Data.Migrations
         Player = table.Column<string>(type: "TEXT", nullable: false),
         X = table.Column<int>(type: "INTEGER", nullable: false),
         Y = table.Column<int>(type: "INTEGER", nullable: false),
-        ShipSize = table.Column<int>(type: "INTEGER", nullable: false),
-        IsEmpty = table.Column<bool>(type: "INTEGER", nullable: false),
-        IsHitted = table.Column<bool>(type: "INTEGER", nullable: false),
-        IsValid = table.Column<bool>(type: "INTEGER", nullable: false)
+        ShipSize = table.Column<int>(type: "INTEGER", nullable: false)
     },
     constraints: table =>
     {

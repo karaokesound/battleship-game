@@ -9,6 +9,8 @@ namespace BattleshipGame.Data.DbContexts
 
         public DbSet<FieldEntity> Fields { get; set; } = null!;
 
+        public DbSet<GameEntity> Games { get; set; } = null!;
+
         public BattleshipGameDbContext(DbContextOptions<BattleshipGameDbContext> options)
             : base(options)
         {

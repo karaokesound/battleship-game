@@ -9,6 +9,7 @@ namespace BattleshipGame.Data.Configuration
         public void Configure(EntityTypeBuilder<FieldEntity> builder)
         {
             builder.HasKey(f => f.Id);
+            builder.Property(f => f.Id).ValueGeneratedOnAdd();
             builder.Property(f => f.X);
             builder.Property(f => f.Y);
             builder.Property(f => f.Player);
