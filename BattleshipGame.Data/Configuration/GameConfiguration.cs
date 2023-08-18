@@ -13,7 +13,7 @@ namespace BattleshipGame.Data.Configuration
             builder.Property(g => g.Id)
                 .ValueGeneratedOnAdd();
 
-            // Relacje z graczami
+            // Relation with players
             builder.HasOne(g => g.Player1)
                 .WithMany()
                 .IsRequired()
@@ -24,7 +24,7 @@ namespace BattleshipGame.Data.Configuration
                 .IsRequired()
                 .HasForeignKey(g => g.Player2.Id);
 
-            // Relacje z planszami graczy
+            // Relation with players' boards
             builder.HasMany(g => g.Player1Board)
                 .WithOne()
                 .HasForeignKey(f => f.Id)

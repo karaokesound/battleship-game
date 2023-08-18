@@ -4,6 +4,7 @@ using BattleshipGame.API.Services;
 using BattleshipGame.Data.DbContexts;
 using BattleshipGame.Logic.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,9 +16,14 @@ builder.Services.AddControllers(options =>
   .AddXmlDataContractSerializerFormatters();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.EnableAnnotations();
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "BattleshipGame.API", Version = "v1" });
+});
 
 // MY SERVICES
+
 builder.Services.AddDbContext<BattleshipGameDbContext>(dbContextOptions =>
 dbContextOptions.UseSqlite(builder.Configuration["ConnectionStrings:BattleshipGameDBConnectionString"]));
 
@@ -28,17 +34,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddSingleton<IValidationService, ValidationService>();
 builder.Services.AddSingleton<IGeneratingService, GeneratingService>();
 builder.Services.AddScoped<iFieldRepository, FieldRepository>();
-
-//var serviceProvider = new ServiceCollection()
-//                .AddSingleton<IValidationService, ValidationService>()
-//                .AddSingleton<IGeneratingService, GeneratingService>()
-//                .BuildServiceProvider();
-
-//// Tworzenie obiektu GameCore
-
-//var gameCore = new GameCore(10, 10, 12,
-//    serviceProvider.GetRequiredService<IValidationService>(),
-//    serviceProvider.GetRequiredService<IGeneratingService>());
+builder.Services.AddScoped<IGameRepository, GameRepository>();
 
 var app = builder.Build();
 

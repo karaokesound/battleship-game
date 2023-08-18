@@ -26,11 +26,18 @@
 
         public string GameBoardNotFound()
         {
-            string message = "Sorry! Game board for this player name wasn't found. Check if you've passed correct player" +
-                " and try again.";
+            string message = "Sorry! Game board for this player name wasn't found. Make sure you've started the game" +
+                " and passed correct player name.";
 
             return message;
         }
 
+        public string StartGameError()
+        {
+            string message = "Sorry! Game can't be started because of wrong data. Insert 1 as a key and your player name" +
+                " to start the game.";
+
+            return message;
+        }
     }
 }

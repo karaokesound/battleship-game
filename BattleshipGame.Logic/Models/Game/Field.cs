@@ -6,7 +6,7 @@
 
         public int Y { get; set; }
 
-        public string Username { get; set; }
+        public string Player { get; set; }
 
         public int ShipSize { get; set; }
 
@@ -16,11 +16,11 @@
 
         public bool IsValid { get; set; }
 
-        public Field(int x, int y, string username)
+        public Field(int x, int y, string player)
         {
             X = x;
             Y = y;
-            Username = username;
+            Player = player;
             IsEmpty = true;
             IsHitted = false;
             IsValid = true;

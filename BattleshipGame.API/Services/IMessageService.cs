@@ -9,5 +9,7 @@
         string Delete();
 
         string GameBoardNotFound();
+
+        string StartGameError();
     }
 }

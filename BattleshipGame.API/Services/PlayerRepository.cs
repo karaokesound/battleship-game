@@ -33,7 +33,7 @@ namespace BattleshipGame.API.Services
                 .Select(p => p.Id)
                 .ToListAsync();
 
-            if (playersIds == null || playersIds.Count == 0) return null;
+            if (playersIds == null || playersIds.Count == 0 || firstPlayer == null) return null;
 
             int minId = playersIds.Min();
             int maxId = playersIds.Max();

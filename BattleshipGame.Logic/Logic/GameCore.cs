@@ -1,7 +1,5 @@
 ﻿using BattleshipGame.API.Models.Game;
-using BattleshipGame.Logic.Models.Game;
 using BattleshipGame.Logic.Services;
-using System.Text;
 
 namespace BattleshipGame.Logic.Logic
 {
@@ -42,7 +40,7 @@ namespace BattleshipGame.Logic.Logic
             GenerateFields();
             GenerateShips(NumberOfShips);
             GenerateRandomCoordinates();
-            DisplayShipsCoordinatesAndGameBoard();
+            GenerateAndDisplayGameBoard();
         }
 
         public void GenerateFields()
@@ -69,11 +67,12 @@ namespace BattleshipGame.Logic.Logic
                     int startY = random.Next(0, XField);
                     int endX = 0;
                     int endY = 0;
-                    bool mixedDirection = random.Next(2) == 0 ? true : false;
                     int XDirection = random.Next(2) == 0 ? 1 : -1;
                     int YDirection = random.Next(2) == 0 ? 1 : -1;
-                    bool verticalHorizontal = random.Next(4) != 0; // 2/3 szansy na pionowy kierunek
                     int tripleShipDirection = random.Next(2) == 0 ? 1 : -1;
+
+                    bool verticalHorizontal = random.Next(4) != 0;
+                    bool mixedDirection = random.Next(2) == 0 ? true : false;
 
                     if (ship.Size == 4)
                     {
@@ -196,7 +195,7 @@ namespace BattleshipGame.Logic.Logic
             return false;
         }
 
-        public string DisplayShipsCoordinatesAndGameBoard()
+        public string GenerateAndDisplayGameBoard()
         {
             int countSingleShips = 0;
             int countDoubleShips = 0;
@@ -214,7 +213,7 @@ namespace BattleshipGame.Logic.Logic
             if (countSingleShips != 5 || countDoubleShips != 8 || countTripleShips != 9)
             {
                 GenerateRandomCoordinates();
-                DisplayShipsCoordinatesAndGameBoard();
+                GenerateAndDisplayGameBoard();
             }
 
             return _generatingService.GenerateGameBoard(Fields, XField, YField);

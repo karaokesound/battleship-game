@@ -4,6 +4,7 @@ using BattleshipGame.API.Services;
 using BattleshipGame.Data.Entities;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace BattleshipGame.API.Controllers
 {
@@ -30,6 +31,7 @@ namespace BattleshipGame.API.Controllers
             _message = message;
         }
 
+        [SwaggerOperation(Summary = "Get all players.")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PlayerDto>>> GetPlayers()
         {
@@ -54,6 +56,7 @@ namespace BattleshipGame.API.Controllers
             return Ok(_mapper.Map<PlayerDto>(selectedPlayer));
         }
 
+        [SwaggerOperation(Summary = "Create a new player.")]
         [HttpPost]
         public async Task<ActionResult<PlayerDto>> CreatePlayer(PlayerForCreationDto playerForCreation)
         {
@@ -98,7 +101,7 @@ namespace BattleshipGame.API.Controllers
 
             var playerToPatch = _mapper.Map<PlayerForUpdateDto>(selectedPlayerDb);
 
-            // This method applies provided changes and properties with no changes stays as their are.
+            // This method applies provided changes and properties with no changes stays as their were.
             // Without this patching, properties with no changes would be null.
             patchDocument.ApplyTo(playerToPatch, ModelState);
 

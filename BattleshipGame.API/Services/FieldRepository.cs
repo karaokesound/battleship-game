@@ -1,6 +1,7 @@
 ﻿using BattleshipGame.Data.DbContexts;
 using BattleshipGame.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Numerics;
 
 namespace BattleshipGame.API.Services
 {
@@ -11,6 +12,16 @@ namespace BattleshipGame.API.Services
         public FieldRepository(BattleshipGameDbContext context)
         {
             _context = context;
+        }
+
+        public async Task<FieldEntity> GetPlayerFieldAsync(string player, int x, int y)
+        {
+            var field = await _context.Fields
+                .FirstOrDefaultAsync(f => f.Player == player && f.X == x && f.Y == y);
+
+            if (field == null) return null;
+
+            return field;
         }
 
         public async Task<List<FieldEntity>> GetPlayerFieldsAsync(string player)
@@ -47,6 +58,19 @@ namespace BattleshipGame.API.Services
                 });
 
             return true;
+        }
+
+        public void UpdateFields(List<FieldEntity> hittedFields)
+        {
+            var fieldsToUpdate = new List<FieldEntity>();
+
+            foreach (var field in hittedFields)
+            {
+                var xy = _context.Fields
+                .FirstOrDefault(f => f.Player == field.Player && f.X == field.X && f.Y == field.Y);
+
+                xy.IsHitted = true;
+            }
         }
 
         public void DeleteAllFields()

@@ -17,9 +17,9 @@ namespace BattleshipGame.Logic.Services
 
             selectedField.IsEmpty = false;
             selectedField.ShipSize = 1;
-            selectedField.Username = username;
+            selectedField.Player = username;
 
-            // Finds invalid fields and adjusts IsValid property to false.
+            // Finds invalid fields and adjusts their IsValid property to false.
 
             var invalidFields = allFields.FindAll(xy => (xy.X == selectedField.X + 1 || xy.X == selectedField.X - 1) && xy.Y == selectedField.Y
             || (xy.Y == selectedField.Y - 1 || xy.Y == selectedField.Y + 1) && xy.X == selectedField.X
@@ -56,10 +56,10 @@ namespace BattleshipGame.Logic.Services
             {
                 field.IsEmpty = false;
                 field.ShipSize = 2;
-                field.Username = username;
+                field.Player = username;
             }
 
-            // Finds invalid fields and adjusts IsValid property to false.
+            // Finds invalid fields and adjusts their IsValid property to false.
 
             var invalidFields = new List<Field>();
 
@@ -97,7 +97,7 @@ namespace BattleshipGame.Logic.Services
             {
                 field.IsEmpty = false;
                 field.ShipSize = 3;
-                field.Username = username;
+                field.Player = username;
             }
 
             var invalidFields = new List<Field>();
@@ -146,7 +146,7 @@ namespace BattleshipGame.Logic.Services
             {
                 field.IsEmpty = false;
                 field.ShipSize = 4;
-                field.Username = username;
+                field.Player = username;
             }
 
             var invalidFields = new List<Field>();
