@@ -150,9 +150,9 @@ namespace BattleshipGame.API.Controllers
             var players = await _fieldRepository.GetCurrentPlayersByFieldsAsync();
             var opponentPlayer = players[1];
 
-            if (string.IsNullOrEmpty(playerName) || string.IsNullOrEmpty(coordinates))
+            if (string.IsNullOrEmpty(playerName) || string.IsNullOrEmpty(coordinates) || playerName != players[0])
             {
-                return BadRequest("Player name and coordinates are required.");
+                return BadRequest("Valid player name and coordinates are required.");
             }
 
             string[] coordinatePairs = coordinates.Split(' ', StringSplitOptions.RemoveEmptyEntries);
