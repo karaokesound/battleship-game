@@ -4,18 +4,8 @@
     {
         public int Id { get; set; }
 
-        public PlayerEntity Player1 { get; set; }
+        public int Player1Id { get; set; }
 
-        public PlayerEntity Player2 { get; set; }
-
-        public ICollection<FieldEntity> Player1Board { get; set; }
-
-        public ICollection<FieldEntity> Player2Board { get; set; }
-
-        public GameEntity()
-        {
-            Player1Board = new List<FieldEntity>();
-            Player2Board = new List<FieldEntity>();
-        }
+        public int Player2Id { get; set; }
     }
 }

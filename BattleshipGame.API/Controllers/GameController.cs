@@ -3,6 +3,7 @@ using BattleshipGame.API.Models.Game;
 using BattleshipGame.API.Services;
 using BattleshipGame.Data.Entities;
 using BattleshipGame.Logic.Logic;
+using BattleshipGame.Logic.Models.Game;
 using BattleshipGame.Logic.Services;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -49,31 +50,33 @@ namespace BattleshipGame.API.Controllers
         public async Task<ActionResult> GenerateBoards(
             [SwaggerParameter(Description = "Insert your nickname")] string playerName)
         {
-            // Method firstly checks if any fields are generated from previous games. If yes, it deletes all fields.
-            // Then player 2 is randomly searched from database and two game boards are created and added to the database
-            // so as to manipulate them during a game.
+            // Method firstly checks if any fields are generated from previous games. If true, it deletes all fields.
+            // Then player 2 is randomly searched from database and game boards for both players are creating and adding
+            // to the database.
 
             _fieldRepository.DeleteAllFields();
             await _fieldRepository.SaveChangesAsync();
 
+            PlayerEntity? player1 = await _playersRepository.GetPlayerByNameAsync(playerName);
             PlayerEntity? player2 = await _playersRepository.GetRandomPlayerAsync(playerName);
-            if (player2 == null) return NotFound();
+
+            if (player1 == null || player2 == null) return NotFound();
 
             // Create game boards and add them to the database
 
-            var board1 = new GameCore(10, 10, 12, playerName, _validation, _generatingService);
+            var board1 = new GameCore(10, 10, 12, player1.Name, _validation, _generatingService);
             var board2 = new GameCore(10, 10, 12, player2.Name, _validation, _generatingService);
 
             foreach (var field in board1.Fields)
             {
-                await _fieldRepository.AddFieldAsync(field.X, field.Y, field.ShipSize, field.IsEmpty, field.IsHitted, field.IsValid,
-                     playerName);
+                FieldEntity mappedField = _mapper.Map<FieldEntity>(field);
+                await _fieldRepository.AddFieldAsync(mappedField, player1);
             }
 
             foreach (var field in board2.Fields)
             {
-                await _fieldRepository.AddFieldAsync(field.X, field.Y, field.ShipSize, field.IsEmpty, field.IsHitted, field.IsValid,
-                    player2.Name);
+                FieldEntity mappedField = _mapper.Map<FieldEntity>(field);
+                await _fieldRepository.AddFieldAsync(mappedField, player2);
             }
 
             await _fieldRepository.SaveChangesAsync();

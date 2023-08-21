@@ -6,5 +6,7 @@ namespace BattleshipGame.API.Services
     {
         Task AddNewGameAsync(PlayerEntity player1, PlayerEntity player2, List<FieldEntity> player1Board,
             List<FieldEntity> player2Board);
+
+        Task<bool> SaveChangesAsync();
     }
 }

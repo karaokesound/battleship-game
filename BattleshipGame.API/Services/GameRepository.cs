@@ -17,11 +17,14 @@ namespace BattleshipGame.API.Services
         {
             _context.Games.Add(new GameEntity()
             {
-                Player1 = player1,
-                Player2 = player2,
-                Player1Board = player1Board,
-                Player2Board = player2Board
+                Player1Id = player1.Id,
+                Player2Id = player2.Id
             });
+        }
+
+        public async Task<bool> SaveChangesAsync()
+        {
+            return (await _context.SaveChangesAsync() >= 0);
         }
     }
 }

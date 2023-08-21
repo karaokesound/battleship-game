@@ -9,7 +9,8 @@ namespace BattleshipGame.API.Profiles
         public FieldProfile()
         {
             CreateMap<FieldEntity, Field>()
-           .ConstructUsing((src, context) => new Field(src.X, src.Y, src.Player));
+           .ConstructUsing((src, context) => new Field(src.X, src.Y, src.Player.Name));
+            CreateMap<Field, FieldEntity>();
         }
     }
 }

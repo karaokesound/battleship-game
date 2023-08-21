@@ -17,7 +17,7 @@ namespace BattleshipGame.API.Services
         public async Task<FieldEntity> GetPlayerFieldAsync(string player, int x, int y)
         {
             var field = await _context.Fields
-                .FirstOrDefaultAsync(f => f.Player == player && f.X == x && f.Y == y);
+                .FirstOrDefaultAsync(f => f.Player.Name == player && f.X == x && f.Y == y);
 
             if (field == null) return null;
 
@@ -27,19 +27,19 @@ namespace BattleshipGame.API.Services
         public async Task<List<FieldEntity>> GetPlayerFieldsAsync(string player)
         {
             return await _context.Fields
-                .Where(f => f.Player == player)
+                .Where(f => f.Player.Name == player)
                 .ToListAsync();
         }
 
         public async Task<List<string>> GetCurrentPlayersByFieldsAsync()
         {
             return await _context.Fields
-                .Select(p => p.Player)
+                .Select(p => p.Player.Name)
                 .Distinct()
                 .ToListAsync();
         }
 
-        public async Task<bool> AddFieldAsync(int x, int y, int shipSize, bool isEmpty, bool isHitted, bool isValid, string player)
+        public async Task<bool> AddFieldAsync(FieldEntity field, PlayerEntity player)
         {
             var field = await _context.Fields.FirstOrDefaultAsync(f => f.X == x && f.Y == y);
 
@@ -54,7 +54,6 @@ namespace BattleshipGame.API.Services
                     IsEmpty = isEmpty,
                     IsHitted = isHitted,
                     IsValid = isValid,
-                    Player = player,
                 });
 
             return true;

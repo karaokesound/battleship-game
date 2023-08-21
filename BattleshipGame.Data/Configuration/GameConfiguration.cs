@@ -13,27 +13,11 @@ namespace BattleshipGame.Data.Configuration
             builder.Property(g => g.Id)
                 .ValueGeneratedOnAdd();
 
-            // Relation with players
-            builder.HasOne(g => g.Player1)
-                .WithMany()
-                .IsRequired()
-                .HasForeignKey(g => g.Player1.Id);
+            builder.Property(g => g.Player1Id)
+                .IsRequired();
 
-            builder.HasOne(g => g.Player2)
-                .WithMany()
-                .IsRequired()
-                .HasForeignKey(g => g.Player2.Id);
-
-            // Relation with players' boards
-            builder.HasMany(g => g.Player1Board)
-                .WithOne()
-                .HasForeignKey(f => f.Id)
-                .OnDelete(DeleteBehavior.Cascade); 
-
-            builder.HasMany(g => g.Player2Board)
-                .WithOne()
-                .HasForeignKey(f => f.Id)
-                .OnDelete(DeleteBehavior.Cascade);
+            builder.Property(g => g.Player2Id)
+                .IsRequired();
         }
     }
 }
