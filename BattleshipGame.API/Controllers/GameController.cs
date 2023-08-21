@@ -116,7 +116,7 @@ namespace BattleshipGame.API.Controllers
         [SwaggerResponse(StatusCodes.Status200OK, "Shot was successful.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid coordinates format.")]
         [HttpPost("shoot/{playerName}")]
-        public async Task<ActionResult> PlayerShoot(
+        public async Task<ActionResult> ShootAtCoordinates(
             [SwaggerParameter(Description = "Name of the player who shoots [your nickname]")] string playerName,
             [SwaggerParameter(Description = "Coordinates in the format (x,y): 0,1 2,1")] string coordinates)
 
@@ -135,6 +135,7 @@ namespace BattleshipGame.API.Controllers
             if (coordinatePairs.Length > 5) return BadRequest("Maximum 5 coordinate pairs.");
 
             List<FieldEntity> fieldsToUpdate = new List<FieldEntity>();
+            List<string> hitteedFields = new List<string>();
 
             foreach (string coordinatePair in coordinatePairs)
             {
@@ -147,12 +148,19 @@ namespace BattleshipGame.API.Controllers
                     return BadRequest("Invalid coordinates format.");
                 }
 
-                FieldEntity field = await _fieldRepository.GetPlayerFieldAsync(opponentPlayer, x, y);
+                FieldEntity field = await _fieldRepository.GetPlayerFieldAsync(opponent.Name, x, y);
+                
 
-                if (field != null && (field.IsEmpty || !field.IsEmpty))
+                if (field != null && field.IsEmpty)
                 {
                     field.IsHitted = true;
                     fieldsToUpdate.Add(field);
+                }
+                else if (field != null && !field.IsEmpty)
+                {
+                    field.IsHitted = true;
+                    fieldsToUpdate.Add(field);
+                    hitteedFields.Add($"(X, Y) : ({field.X}, {field.Y})");
                 }
             }
 
@@ -162,7 +170,15 @@ namespace BattleshipGame.API.Controllers
                 await _fieldRepository.SaveChangesAsync();
             }
 
-            return Ok("Shots fired successfully.");
+            if (hitteedFields.Count > 0)
+            {
+                var message = $"Shoot successful! You've hit {hitteedFields.Count} field(s).";
+                var jsonResult = new JsonResult(hitteedFields);
+
+                return Ok(new { Message = message, Data = jsonResult.Value });
+            }
+
+            return Ok("Sorry! You've not hit any opponent's ship. Try again in the next round!");
         }
     }
 }
