@@ -147,7 +147,7 @@ namespace BattleshipGame.API.Controllers
                     return BadRequest("Invalid coordinates format.");
                 }
 
-                FieldEntity field = await _fieldRepository.GetPlayerFieldAsync(opponentPlayer, x, y);
+                FieldEntity field = await _fieldRepository.GetPlayerFieldAsync(opponent.Name, x, y);
 
                 if (field != null && (field.IsEmpty || !field.IsEmpty))
                 {
