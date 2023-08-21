@@ -1,4 +1,5 @@
-﻿using BattleshipGame.Data.Entities;
+﻿using BattleshipGame.API.Models.Game;
+using BattleshipGame.Data.Entities;
 
 namespace BattleshipGame.API.Services
 {
@@ -10,7 +11,7 @@ namespace BattleshipGame.API.Services
 
         Task<List<string>> GetCurrentPlayersByFieldsAsync();
 
-        Task<bool> AddFieldAsync(FieldEntity field, PlayerEntity player);
+        Task<bool> AddFieldAsync(Field field, PlayerEntity player);
 
         void UpdateFields(List<FieldEntity> hittedFields);
 

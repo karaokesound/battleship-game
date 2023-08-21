@@ -12,8 +12,8 @@ namespace BattleshipGame.API.Services
             _context = context;
         }
 
-        public async Task AddNewGameAsync(PlayerEntity player1, PlayerEntity player2, List<FieldEntity> player1Board,
-            List<FieldEntity> player2Board)
+
+        public async Task AddNewGameAsync(PlayerEntity player1, PlayerEntity player2)
         {
             _context.Games.Add(new GameEntity()
             {
@@ -22,6 +22,22 @@ namespace BattleshipGame.API.Services
             });
         }
 
+        public async Task<List<int>> GetPlayersIds()
+        {
+            List<int> playersIds = new List<int>
+            {
+                _context.Games
+                .Select(p => p.Player1Id)
+                .FirstOrDefault(),
+
+                _context.Games
+                .Select(p => p.Player2Id)
+                .FirstOrDefault()
+            };
+
+            return playersIds;
+        }
+        
         public async Task<bool> SaveChangesAsync()
         {
             return (await _context.SaveChangesAsync() >= 0);

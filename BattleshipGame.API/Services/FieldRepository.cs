@@ -1,4 +1,5 @@
-﻿using BattleshipGame.Data.DbContexts;
+﻿using BattleshipGame.API.Models.Game;
+using BattleshipGame.Data.DbContexts;
 using BattleshipGame.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Numerics;
@@ -39,21 +40,18 @@ namespace BattleshipGame.API.Services
                 .ToListAsync();
         }
 
-        public async Task<bool> AddFieldAsync(FieldEntity field, PlayerEntity player)
+        public async Task<bool> AddFieldAsync(Field field, PlayerEntity player)
         {
-            var field = await _context.Fields.FirstOrDefaultAsync(f => f.X == x && f.Y == y);
-
-            if (field != null) return false;
-
             _context.Fields.Add(
                 new FieldEntity()
                 {
-                    X = x,
-                    Y = y,
-                    ShipSize = shipSize,
-                    IsEmpty = isEmpty,
-                    IsHitted = isHitted,
-                    IsValid = isValid,
+                    X = field.X,
+                    Y = field.Y,
+                    ShipSize = field.ShipSize,
+                    IsEmpty = field.IsEmpty,
+                    IsHitted = field.IsHitted,
+                    IsValid = field.IsValid,
+                    Player = player,
                 });
 
             return true;
@@ -75,7 +73,7 @@ namespace BattleshipGame.API.Services
         public void DeleteAllFields()
         {
             List<FieldEntity> allFields = _context.Fields.ToList();
-            
+
             foreach (var field in allFields)
             {
                 _context.Remove(field);
