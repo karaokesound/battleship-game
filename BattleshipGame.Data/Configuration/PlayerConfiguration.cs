@@ -20,6 +20,8 @@ namespace BattleshipGame.Data.Configuration
 
             builder.Property(p => p.Game);
 
+            builder.Property(p => p.CanShoot);
+
             // many-to-one relation
             builder.HasMany(g => g.GameBoard)
                 .WithOne(g => g.Player)
