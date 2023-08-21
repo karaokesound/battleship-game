@@ -125,10 +125,12 @@ namespace BattleshipGame.API.Controllers
             var player = await _playersRepository.GetPlayerAsync(playersIds[0]);
             var opponent = await _playersRepository.GetPlayerAsync(playersIds[1]);
 
-            if (string.IsNullOrEmpty(coordinates) || playerName != player.Name)
+            if (string.IsNullOrEmpty(coordinates) || playerName != player.Name || player == null)
             {
                 return BadRequest("Valid player name and coordinates are required.");
             }
+
+            if (!player.CanShoot) return BadRequest($"You've taken your shoot. Now it's {opponent.Name} turn.");
 
             string[] coordinatePairs = coordinates.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
@@ -169,6 +171,9 @@ namespace BattleshipGame.API.Controllers
                 _fieldRepository.UpdateFields(fieldsToUpdate);
                 await _fieldRepository.SaveChangesAsync();
             }
+
+            player.CanShoot = true ? false : true;
+            _playersRepository.SaveChangesAsync();
 
             if (hitteedFields.Count > 0)
             {
