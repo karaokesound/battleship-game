@@ -1,5 +1,6 @@
 ﻿using BattleshipGame.Data.DbContexts;
 using BattleshipGame.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace BattleshipGame.API.Services
 {
@@ -36,6 +37,16 @@ namespace BattleshipGame.API.Services
             };
 
             return playersIds;
+        }
+
+        public void DeleteAllGames()
+        {
+            List<GameEntity> games = _context.Games.ToList();
+
+            foreach (var game in games)
+            {
+                _context.Games.Remove(game);
+            }
         }
         
         public async Task<bool> SaveChangesAsync()

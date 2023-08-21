@@ -67,7 +67,7 @@ namespace BattleshipGame.Logic.Services
             return shipsList;
         }
 
-        public string GenerateGameBoard(List<Field> fields, int XFields, int YFields)
+        public string DisplayGameBoard(List<Field> fields, int XFields, int YFields)
         {
             var gameBoard = new StringBuilder();
 

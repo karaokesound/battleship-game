@@ -59,13 +59,22 @@ namespace BattleshipGame.API.Controllers
 
             // Add new Game object to the database
 
+            _fieldRepository.DeleteAllFields();
+            await _fieldRepository.SaveChangesAsync();
+            _gameRepository.DeleteAllGames();
+            await _gameRepository.SaveChangesAsync();
+
+            player1.CanShoot = true;
+            player2.CanShoot = false;
+
+            await _playersRepository.SaveChangesAsync();
             await _gameRepository.AddNewGameAsync(player1, player2);
             await _gameRepository.SaveChangesAsync();
+            
 
             // Generates boards for two players
 
-            _fieldRepository.DeleteAllFields();
-            await _fieldRepository.SaveChangesAsync();
+            
 
             // Create game boards and add them to the database
 
@@ -109,7 +118,7 @@ namespace BattleshipGame.API.Controllers
 
             var mappedPlayerFields = _mapper.Map<List<Field>>(playerFields);
 
-            return Ok(_generatingService.GenerateGameBoard(mappedPlayerFields, 10, 10));
+            return Ok(_generatingService.DisplayGameBoard(mappedPlayerFields, 10, 10));
         }
         
         [SwaggerOperation(Summary = "Shoots at target coordinates.")]
@@ -152,7 +161,6 @@ namespace BattleshipGame.API.Controllers
 
                 FieldEntity field = await _fieldRepository.GetPlayerFieldAsync(opponent.Name, x, y);
                 
-
                 if (field != null && field.IsEmpty)
                 {
                     field.IsHitted = true;
@@ -173,7 +181,8 @@ namespace BattleshipGame.API.Controllers
             }
 
             player.CanShoot = true ? false : true;
-            _playersRepository.SaveChangesAsync();
+            opponent.CanShoot = false ? false : true;
+            await _playersRepository.SaveChangesAsync();
 
             if (hitteedFields.Count > 0)
             {
@@ -184,6 +193,58 @@ namespace BattleshipGame.API.Controllers
             }
 
             return Ok("Sorry! You've not hit any opponent's ship. Try again in the next round!");
+        }
+
+        [HttpPatch("shoot/opponent")]
+        public async Task<ActionResult> RandomShootByOpponent()
+        {
+            var playersIds = await _gameRepository.GetPlayersIds();
+            var player = await _playersRepository.GetPlayerAsync(playersIds[0]);
+            var opponent = await _playersRepository.GetPlayerAsync(playersIds[1]);
+
+            if (opponent == null)
+            {
+                return BadRequest(_message.PlayerNotFoundMessage());
+            }
+
+            if (!opponent.CanShoot) return BadRequest($"Sorry! This operations can't be proceed. Now it's {player.Name} turn");
+
+            Random random = new Random();
+            int randomX = random.Next(0, 9);
+            int randomY = random.Next(0, 9);
+
+            List<FieldEntity> fieldsToUpdate = new List<FieldEntity>();
+            List<string> hittedFields = new List<string>();
+            FieldEntity field = await _fieldRepository.GetPlayerFieldAsync(player.Name, randomX, randomY);
+
+            if (field != null && field.IsEmpty)
+            {
+                field.IsHitted = true;
+                fieldsToUpdate.Add(field);
+            }
+            else if (field != null && !field.IsEmpty)
+            {
+                field.IsHitted = true;
+                fieldsToUpdate.Add(field);
+                hittedFields.Add($"(X, Y) : ({field.X}, {field.Y})");
+            }
+
+            opponent.CanShoot = true ? false : true;
+            player.CanShoot = false ? false : true;
+
+            await _playersRepository.SaveChangesAsync();
+
+            if (hittedFields.Count > 0)
+            {
+                var message = $"{opponent.Name} hit {hittedFields.Count} of your field(s). See details below.";
+                var jsonResult = new JsonResult(hittedFields);
+
+                return Ok(new { Message = message, Data = jsonResult.Value });
+            }
+
+            await DisplayGameBoard(player.Name);
+
+            return Ok(await DisplayGameBoard(player.Name));
         }
     }
 }

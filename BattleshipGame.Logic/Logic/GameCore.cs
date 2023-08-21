@@ -216,7 +216,7 @@ namespace BattleshipGame.Logic.Logic
                 GenerateAndDisplayGameBoard();
             }
 
-            return _generatingService.GenerateGameBoard(Fields, XField, YField);
+            return _generatingService.DisplayGameBoard(Fields, XField, YField);
         }
     }
 }

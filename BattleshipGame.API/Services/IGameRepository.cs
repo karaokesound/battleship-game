@@ -8,6 +8,8 @@ namespace BattleshipGame.API.Services
 
         Task<List<int>> GetPlayersIds();
 
+        void DeleteAllGames();
+
         Task<bool> SaveChangesAsync();
     }
 }

@@ -8,6 +8,6 @@ namespace BattleshipGame.Logic.Services
 
         List<Ship> GenerateShips(int numberOfShips);
 
-        string GenerateGameBoard(List<Field> fields, int XFields, int YFields);
+        string DisplayGameBoard(List<Field> fields, int XFields, int YFields);
     }
 }
