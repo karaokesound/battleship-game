@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BattleshipGame.Data.Migrations
 {
     [DbContext(typeof(BattleshipGameDbContext))]
-    [Migration("20230821163543_canshoot-playerentity")]
+    [Migration("20230821164440_canshoot-playerentity")]
     partial class canshootplayerentity
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -97,7 +97,7 @@ namespace BattleshipGame.Data.Migrations
                         new
                         {
                             Id = 1,
-                            CanShoot = false,
+                            CanShoot = true,
                             City = "City1",
                             Game = 0,
                             Name = "Player1"
@@ -105,7 +105,7 @@ namespace BattleshipGame.Data.Migrations
                         new
                         {
                             Id = 2,
-                            CanShoot = false,
+                            CanShoot = true,
                             City = "City1",
                             Game = 0,
                             Name = "Player2"
@@ -113,7 +113,7 @@ namespace BattleshipGame.Data.Migrations
                         new
                         {
                             Id = 3,
-                            CanShoot = false,
+                            CanShoot = true,
                             City = "City1",
                             Game = 0,
                             Name = "Player3"
@@ -121,7 +121,7 @@ namespace BattleshipGame.Data.Migrations
                         new
                         {
                             Id = 4,
-                            CanShoot = false,
+                            CanShoot = true,
                             City = "City1",
                             Game = 0,
                             Name = "Player4"
@@ -129,7 +129,7 @@ namespace BattleshipGame.Data.Migrations
                         new
                         {
                             Id = 5,
-                            CanShoot = false,
+                            CanShoot = true,
                             City = "City1",
                             Game = 0,
                             Name = "Player5"
