@@ -44,40 +44,46 @@ namespace BattleshipGame.API.Controllers
             _gameRepository = gameRepository;
         }
 
-        [SwaggerOperation(Summary = "Generate only the game boards")]
-        [HttpPost("{playerName}")]
-        public async Task<ActionResult> GenerateBoards(
-            [SwaggerParameter(Description = "Insert your nickname")] string playerName)
+        [SwaggerOperation(Summary = "Start the game.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Success.")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid key or player name.")]
+        [HttpPost("start/{key}/{playerName}")]
+        public async Task<ActionResult> StartGame(
+            [SwaggerParameter(Description = "Insert 1 to start the game.")] int key,
+            [SwaggerParameter(Description = "Insert your nickname.")] string playerName)
         {
-            // Method firstly checks if any fields are generated from previous games. If yes, it deletes all fields.
-            // Then player 2 is randomly searched from database and two game boards are created and added to the database
-            // so as to manipulate them during a game.
+            PlayerEntity player1 = await _playersRepository.GetPlayerByNameAsync(playerName);
+            PlayerEntity? player2 = await _playersRepository.GetRandomPlayerAsync(playerName);
+
+            if (key != 1 || player1 == null || player2 == null) return BadRequest(_message.StartGameError());
+
+            // Add new Game object to the database
+
+            await _gameRepository.AddNewGameAsync(player1, player2);
+            await _gameRepository.SaveChangesAsync();
+
+            // Generates boards for two players
 
             _fieldRepository.DeleteAllFields();
             await _fieldRepository.SaveChangesAsync();
 
-            PlayerEntity? player2 = await _playersRepository.GetRandomPlayerAsync(playerName);
-            if (player2 == null) return NotFound();
-
             // Create game boards and add them to the database
 
-            var board1 = new GameCore(10, 10, 12, playerName, _validation, _generatingService);
+            var board1 = new GameCore(10, 10, 12, player1.Name, _validation, _generatingService);
             var board2 = new GameCore(10, 10, 12, player2.Name, _validation, _generatingService);
 
             foreach (var field in board1.Fields)
             {
-                await _fieldRepository.AddFieldAsync(field.X, field.Y, field.ShipSize, field.IsEmpty, field.IsHitted, field.IsValid,
-                     playerName);
+                await _fieldRepository.AddFieldAsync(field, player1);
             }
 
             foreach (var field in board2.Fields)
             {
-                await _fieldRepository.AddFieldAsync(field.X, field.Y, field.ShipSize, field.IsEmpty, field.IsHitted, field.IsValid,
-                    player2.Name);
+                await _fieldRepository.AddFieldAsync(field, player2);
             }
 
             await _fieldRepository.SaveChangesAsync();
-            return Ok();
+            return Ok($"Game created successfully! Your opponent is {player2.Name}");
         }
 
         [SwaggerOperation(Summary = "Display a game board for selected user.")]
@@ -88,11 +94,11 @@ namespace BattleshipGame.API.Controllers
             // This method firstly check nicknames of two players who are actually playing and
             // returns game board of player whose nickname is inputted.
 
-            List<string> currPlayersName = await _fieldRepository.GetCurrentPlayersByFieldsAsync();
+            var playersIds = await _gameRepository.GetPlayersIds();
+            var player1 = await _playersRepository.GetPlayerAsync(playersIds[0]);
+            var player2 = await _playersRepository.GetPlayerAsync(playersIds[1]);
 
-            if (playerName == null 
-                || currPlayersName.Count == 0
-                || (playerName != currPlayersName[0] && playerName != currPlayersName[1]))
+            if (playerName != player1.Name && playerName != player2.Name)
             {
                 return NotFound(_message.GameBoardNotFound());
             }
@@ -105,52 +111,21 @@ namespace BattleshipGame.API.Controllers
 
             return Ok(_generatingService.GenerateGameBoard(mappedPlayerFields, 10, 10));
         }
-
-        [SwaggerOperation(Summary = "Start the game.")]
-        [SwaggerResponse(StatusCodes.Status200OK, "Success.")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid key or player name.")]
-        [HttpPost("{key}/{playerName}")]
-        public async Task<ActionResult> StartGame(
-            [SwaggerParameter(Description = "Insert 1 to start the game.")] int key,
-            [SwaggerParameter(Description = "Insert your nickname.")] string playerName)
-        {
-            bool playerExists = await _playersRepository.GetPlayerByNameAsync(playerName) == null ? false : true;
-
-            if (key != 1 || playerName == null || !playerExists) return BadRequest(_message.StartGameError());
-
-            // Generates boards for two players
-
-            await GenerateBoards(playerName);
-
-            PlayerEntity player1 = await _playersRepository.GetPlayerByNameAsync(playerName);
-            PlayerEntity? player2 = await _playersRepository.GetRandomPlayerAsync(playerName);
-
-            if (player2 == null) return NotFound();
-
-            var player1Fields = await _fieldRepository.GetPlayerFieldsAsync(playerName);
-
-            var player2Fields = await _fieldRepository.GetPlayerFieldsAsync(player2.Name);
-
-            // Add new Game object to the database
-
-            await _gameRepository.AddNewGameAsync(player1, player2, player1Fields, player2Fields);
-
-            return Ok("Game created successfully!");
-        }
         
         [SwaggerOperation(Summary = "Shoots at target coordinates.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Shot was successful.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid coordinates format.")]
-        [HttpPost("{playerName}/shoot")]
+        [HttpPost("shoot/{playerName}")]
         public async Task<ActionResult> PlayerShoot(
             [SwaggerParameter(Description = "Name of the player who shoots [your nickname]")] string playerName,
             [SwaggerParameter(Description = "Coordinates in the format (x,y): 0,1 2,1")] string coordinates)
 
         {
-            var players = await _fieldRepository.GetCurrentPlayersByFieldsAsync();
-            var opponentPlayer = players[1];
+            var playersIds = await _gameRepository.GetPlayersIds();
+            var player = await _playersRepository.GetPlayerAsync(playersIds[0]);
+            var opponent = await _playersRepository.GetPlayerAsync(playersIds[1]);
 
-            if (string.IsNullOrEmpty(playerName) || string.IsNullOrEmpty(coordinates) || playerName != players[0])
+            if (string.IsNullOrEmpty(coordinates) || playerName != player.Name)
             {
                 return BadRequest("Valid player name and coordinates are required.");
             }

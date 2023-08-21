@@ -19,10 +19,10 @@ namespace BattleshipGame.API.Services
                 .FirstOrDefaultAsync(i => i.Id == playerId);
         }
 
-        public async Task<PlayerEntity?> GetPlayerByNameAsync(string username)
+        public async Task<PlayerEntity?> GetPlayerByNameAsync(string playerName)
         {
             return await _context.Players
-                .FirstOrDefaultAsync(p => p.Name == username);
+                .FirstOrDefaultAsync(p => p.Name == playerName);
         }
 
         public async Task<PlayerEntity?> GetRandomPlayerAsync(string player1)

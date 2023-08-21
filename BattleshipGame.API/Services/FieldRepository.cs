@@ -1,4 +1,5 @@
-﻿using BattleshipGame.Data.DbContexts;
+﻿using BattleshipGame.API.Models.Game;
+using BattleshipGame.Data.DbContexts;
 using BattleshipGame.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Numerics;
@@ -17,7 +18,7 @@ namespace BattleshipGame.API.Services
         public async Task<FieldEntity> GetPlayerFieldAsync(string player, int x, int y)
         {
             var field = await _context.Fields
-                .FirstOrDefaultAsync(f => f.Player == player && f.X == x && f.Y == y);
+                .FirstOrDefaultAsync(f => f.Player.Name == player && f.X == x && f.Y == y);
 
             if (field == null) return null;
 
@@ -27,33 +28,29 @@ namespace BattleshipGame.API.Services
         public async Task<List<FieldEntity>> GetPlayerFieldsAsync(string player)
         {
             return await _context.Fields
-                .Where(f => f.Player == player)
+                .Where(f => f.Player.Name == player)
                 .ToListAsync();
         }
 
         public async Task<List<string>> GetCurrentPlayersByFieldsAsync()
         {
             return await _context.Fields
-                .Select(p => p.Player)
+                .Select(p => p.Player.Name)
                 .Distinct()
                 .ToListAsync();
         }
 
-        public async Task<bool> AddFieldAsync(int x, int y, int shipSize, bool isEmpty, bool isHitted, bool isValid, string player)
+        public async Task<bool> AddFieldAsync(Field field, PlayerEntity player)
         {
-            var field = await _context.Fields.FirstOrDefaultAsync(f => f.X == x && f.Y == y);
-
-            if (field != null) return false;
-
             _context.Fields.Add(
                 new FieldEntity()
                 {
-                    X = x,
-                    Y = y,
-                    ShipSize = shipSize,
-                    IsEmpty = isEmpty,
-                    IsHitted = isHitted,
-                    IsValid = isValid,
+                    X = field.X,
+                    Y = field.Y,
+                    ShipSize = field.ShipSize,
+                    IsEmpty = field.IsEmpty,
+                    IsHitted = field.IsHitted,
+                    IsValid = field.IsValid,
                     Player = player,
                 });
 
@@ -76,7 +73,7 @@ namespace BattleshipGame.API.Services
         public void DeleteAllFields()
         {
             List<FieldEntity> allFields = _context.Fields.ToList();
-            
+
             foreach (var field in allFields)
             {
                 _context.Remove(field);

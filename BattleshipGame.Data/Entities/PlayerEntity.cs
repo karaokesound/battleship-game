@@ -8,10 +8,15 @@
 
         public string City { get; set; }
 
+        public int Game { get; set; }
+
+        public ICollection<FieldEntity> GameBoard { get; set; }
+
         public PlayerEntity(string name, string city)
         {
             Name = name;
             City = city;
+            GameBoard = new List<FieldEntity>();
         }
     }
 }

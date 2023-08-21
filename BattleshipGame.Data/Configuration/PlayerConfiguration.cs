@@ -9,6 +9,7 @@ namespace BattleshipGame.Data.Configuration
         public void Configure(EntityTypeBuilder<PlayerEntity> builder)
         {
             builder.HasKey(p => p.Id);
+
             builder.Property(p => p.Name)
                 .HasMaxLength(20)
                 .IsRequired();
@@ -16,6 +17,14 @@ namespace BattleshipGame.Data.Configuration
             builder.Property(p => p.City)
                 .HasMaxLength(20)
                 .IsRequired();
+
+            builder.Property(p => p.Game);
+
+            // many-to-one relation
+            builder.HasMany(g => g.GameBoard)
+                .WithOne(g => g.Player)
+                .HasForeignKey(g => g.PlayerId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

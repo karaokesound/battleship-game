@@ -6,7 +6,7 @@ namespace BattleshipGame.API.Services
     {
         Task<PlayerEntity> GetPlayerAsync(int playerId);
 
-        Task<PlayerEntity> GetPlayerByNameAsync(string username);
+        Task<PlayerEntity> GetPlayerByNameAsync(string playerName);
 
         Task<PlayerEntity?> GetRandomPlayerAsync(string player1);
 
