@@ -87,7 +87,7 @@ namespace BattleshipGame.API.Controllers
         }
 
         [SwaggerOperation(Summary = "Display a game board for selected user.")]
-        [HttpGet("/board/{playerName}")]
+        [HttpGet("board/{playerName}")]
         public async Task<ActionResult> DisplayGameBoard(
             [SwaggerParameter(Description = "Insert your nickname")] string playerName)
         {
@@ -115,7 +115,7 @@ namespace BattleshipGame.API.Controllers
         [SwaggerOperation(Summary = "Shoots at target coordinates.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Shot was successful.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid coordinates format.")]
-        [HttpPost("shoot/{playerName}")]
+        [HttpPatch("shoot/{playerName}")]
         public async Task<ActionResult> ShootAtCoordinates(
             [SwaggerParameter(Description = "Name of the player who shoots [your nickname]")] string playerName,
             [SwaggerParameter(Description = "Coordinates in the format (x,y): 0,1 2,1")] string coordinates)
