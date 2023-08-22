@@ -1,4 +1,5 @@
 ﻿using BattleshipGame.API.Models.Game;
+using BattleshipGame.Data.Entities;
 
 namespace BattleshipGame.Logic.Services
 {
@@ -11,5 +12,7 @@ namespace BattleshipGame.Logic.Services
         bool ThreeFieldShipValidation(int startX, int startY, int endX, int endY, List<Field> allFields, string username);
 
         bool FourFieldShipValidation(int startX, int startY, int endX, int endY, List<Field> allFields, string username);
+
+        List<int> CoordinatesValidation(string coordinates);
     }
 }

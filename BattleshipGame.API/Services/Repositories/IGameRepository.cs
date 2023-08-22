@@ -1,6 +1,6 @@
 ﻿using BattleshipGame.Data.Entities;
 
-namespace BattleshipGame.API.Services
+namespace BattleshipGame.API.Services.Repositories
 {
     public interface IGameRepository
     {

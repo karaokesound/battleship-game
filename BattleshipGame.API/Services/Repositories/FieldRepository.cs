@@ -2,9 +2,10 @@
 using BattleshipGame.Data.DbContexts;
 using BattleshipGame.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel;
 using System.Numerics;
 
-namespace BattleshipGame.API.Services
+namespace BattleshipGame.API.Services.Repositories
 {
     public class FieldRepository : iFieldRepository
     {
@@ -30,6 +31,22 @@ namespace BattleshipGame.API.Services
             return await _context.Fields
                 .Where(f => f.Player.Name == player)
                 .ToListAsync();
+        }
+
+        public async Task<List<FieldEntity>> GetInsertedFields(List<int> insertedFields, string opponent)
+        {
+            List<FieldEntity> fields = new List<FieldEntity>();
+
+            for (int coordinate = 0; coordinate < insertedFields.Count; coordinate++)
+            {
+                FieldEntity field = await GetPlayerFieldAsync
+                    (opponent, insertedFields[coordinate], insertedFields[coordinate + 1]);
+
+                fields.Add(field);
+                coordinate++;
+            }
+
+            return fields;
         }
 
         public async Task<List<string>> GetCurrentPlayersByFieldsAsync()
@@ -82,7 +99,7 @@ namespace BattleshipGame.API.Services
 
         public async Task<bool> SaveChangesAsync()
         {
-            return (await _context.SaveChangesAsync() >= 0);
+            return await _context.SaveChangesAsync() >= 0;
         }
     }
 }

@@ -2,7 +2,7 @@
 using BattleshipGame.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace BattleshipGame.API.Services
+namespace BattleshipGame.API.Services.Repositories
 {
     public class PlayerRepository : IPlayersRepository
     {
@@ -74,7 +74,7 @@ namespace BattleshipGame.API.Services
 
         public async Task<bool> SaveChangesAsync()
         {
-            return (await _context.SaveChangesAsync() >= 0);
+            return await _context.SaveChangesAsync() >= 0;
         }
     }
 }

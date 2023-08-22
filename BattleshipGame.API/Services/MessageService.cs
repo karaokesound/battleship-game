@@ -6,7 +6,7 @@ namespace BattleshipGame.API.Services
     {
         public string PlayerNotFoundMessage()
         {
-            string message = "Sorry! This user doesn't exist. Check the id you've entered and try again.";
+            string message = "Sorry! This user doesn't exist. Check the id or username you've entered and try again.";
 
             return message;
         }
