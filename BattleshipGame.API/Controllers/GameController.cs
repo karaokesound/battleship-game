@@ -57,26 +57,23 @@ namespace BattleshipGame.API.Controllers
 
             if (key != 1 || player1 == null || player2 == null) return BadRequest(_message.StartGameError());
 
-            // Add new Game object to the database
+            // Deleting previous game data
 
             _fieldRepository.DeleteAllFields();
             await _fieldRepository.SaveChangesAsync();
             _gameRepository.DeleteAllGames();
             await _gameRepository.SaveChangesAsync();
 
+            // Forcing that Player1[our] takes first shoot
+
             player1.CanShoot = true;
             player2.CanShoot = false;
-
             await _playersRepository.SaveChangesAsync();
+
             await _gameRepository.AddNewGameAsync(player1, player2);
             await _gameRepository.SaveChangesAsync();
-            
 
-            // Generates boards for two players
-
-            
-
-            // Create game boards and add them to the database
+            // Creating game boards and adding them to the database
 
             var board1 = new GameCore(10, 10, 12, player1.Name, _validation, _generatingService);
             var board2 = new GameCore(10, 10, 12, player2.Name, _validation, _generatingService);
@@ -92,22 +89,18 @@ namespace BattleshipGame.API.Controllers
             }
 
             await _fieldRepository.SaveChangesAsync();
-            return Ok($"Game created successfully! Your opponent is {player2.Name}");
+            return Ok(_message.StartGameSuccess(player2.Name));
         }
 
-        [SwaggerOperation(Summary = "Display a game board for selected user.")]
+        [SwaggerOperation(Summary = "Display a game board for inserted user.")]
         [HttpGet("board/{playerName}")]
-        public async Task<ActionResult> DisplayGameBoard(
-            [SwaggerParameter(Description = "Insert your nickname")] string playerName)
+        public async Task<ActionResult> DisplayGameBoard(string playerName)
         {
-            // This method firstly check nicknames of two players who are actually playing and
-            // returns game board of player whose nickname is inputted.
-
             var playersIds = await _gameRepository.GetPlayersIds();
             var player1 = await _playersRepository.GetPlayerAsync(playersIds[0]);
-            var player2 = await _playersRepository.GetPlayerAsync(playersIds[1]);
+            var opponent = await _playersRepository.GetPlayerAsync(playersIds[1]);
 
-            if (playerName != player1.Name && playerName != player2.Name)
+            if (playerName != player1.Name && playerName != opponent.Name)
             {
                 return NotFound(_message.GameBoardNotFound());
             }
@@ -134,16 +127,18 @@ namespace BattleshipGame.API.Controllers
             var player = await _playersRepository.GetPlayerAsync(playersIds[0]);
             var opponent = await _playersRepository.GetPlayerAsync(playersIds[1]);
 
-            if (string.IsNullOrEmpty(coordinates) || playerName != player.Name || player == null)
+            if (string.IsNullOrEmpty(coordinates) || player == null || playerName != player.Name)
             {
-                return BadRequest("Valid player name and coordinates are required.");
+                return BadRequest(_message.ShootError(opponent.Name, "0"));
             }
 
-            if (!player.CanShoot) return BadRequest($"You've taken your shoot. Now it's {opponent.Name} turn.");
+            if (!player.CanShoot) return BadRequest(_message.ShootError(opponent.Name, "1"));
+
+            // Validating coordinates
 
             string[] coordinatePairs = coordinates.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-            if (coordinatePairs.Length > 5) return BadRequest("Maximum 5 coordinate pairs.");
+            if (coordinatePairs.Length > 5) return BadRequest(_message.ShootError(opponent.Name, "2"));
 
             List<FieldEntity> fieldsToUpdate = new List<FieldEntity>();
             List<string> hitteedFields = new List<string>();
@@ -156,7 +151,7 @@ namespace BattleshipGame.API.Controllers
                     !int.TryParse(coordinatesArray[0], out int x) ||
                     !int.TryParse(coordinatesArray[1], out int y))
                 {
-                    return BadRequest("Invalid coordinates format.");
+                    return BadRequest(_message.ShootError(opponent.Name, "2"));
                 }
 
                 FieldEntity field = await _fieldRepository.GetPlayerFieldAsync(opponent.Name, x, y);
@@ -180,19 +175,22 @@ namespace BattleshipGame.API.Controllers
                 await _fieldRepository.SaveChangesAsync();
             }
 
+            // Changing the flag
+
             player.CanShoot = true ? false : true;
             opponent.CanShoot = false ? false : true;
+
             await _playersRepository.SaveChangesAsync();
 
             if (hitteedFields.Count > 0)
             {
-                var message = $"Shoot successful! You've hit {hitteedFields.Count} field(s).";
+                var message = _message.ShotSuccess(hitteedFields.Count);
                 var jsonResult = new JsonResult(hitteedFields);
 
                 return Ok(new { Message = message, Data = jsonResult.Value });
             }
 
-            return Ok("Sorry! You've not hit any opponent's ship. Try again in the next round!");
+            return Ok(_message.ShotMissed());
         }
 
         [HttpPatch("shoot/opponent")]
