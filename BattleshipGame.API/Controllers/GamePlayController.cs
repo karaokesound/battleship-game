@@ -2,6 +2,8 @@
 using BattleshipGame.API.Services.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Reflection.Metadata.Ecma335;
+using static BattleshipGame.API.Services.Controllers.GamePlayService;
 
 namespace BattleshipGame.API.Controllers
 {
@@ -43,26 +45,16 @@ namespace BattleshipGame.API.Controllers
                 var jsonResult = new JsonResult(fieldsAlreadyHit);
                 var jsonResult2 = new JsonResult(allHitFields);
 
-                return BadRequest(new { Message = "This field was already hit! Hit field which wasn't used before.",
+                return BadRequest(new { Message = "This field was already hit! Hit field which wasn't used before. Hit field" +
+                    " are displayed below.",
                     Data = jsonResult.Value, jsonResult2.Value });
             }
 
             // Updating opponent player's fields and returning hit fields that had a ship on them
 
-            List<string> hitShipsCoords = await _service.UpdatePlayerFields(playerName, coordinates);
+            CombinedResponseData response = await _service.UpdatePlayerFields(playerName, coordinates);
 
-            if (hitShipsCoords.Count == 1)
-            {
-                var message = _message.ShotSuccess(hitShipsCoords.Count, hitShipsCoords);
-                return Ok(message);
-            }
-            else if (hitShipsCoords.Count > 1)
-            {
-                var jsonResult = new JsonResult(hitShipsCoords);
-
-                return Ok(new { Message = _message.ShotSuccess(hitShipsCoords.Count, hitShipsCoords), 
-                    Data = jsonResult.Value });
-            }
+            if (response.Message != null) return Ok(response);
                 
             return Ok(_message.ShotMissed());
         }

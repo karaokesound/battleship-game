@@ -3,6 +3,8 @@ using BattleshipGame.API.Models.Game;
 using BattleshipGame.API.Services.Repositories;
 using BattleshipGame.Data.Entities;
 using BattleshipGame.Logic.Services;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BattleshipGame.API.Services.Controllers
 {
@@ -59,14 +61,14 @@ namespace BattleshipGame.API.Services.Controllers
             return "";
         }
 
-        public async Task<List<string>> UpdatePlayerFields(string playerName, string coordinates)
+        public async Task<CombinedResponseData> UpdatePlayerFields(string playerName, string coordinates)
         {
             var players = await GetPlayers();
 
             List<int> validCoordsId = _validation.ValidateCoordsFormatAndReturnId(coordinates);
             List<FieldEntity> dbOpponentCoords = await _fieldRepository.GetInsertedFields(validCoordsId, players[1].Name);
 
-            List<string> hittedShipsCoords = new List<string>();
+            List<string> hitShipsCoords = new List<string>();
 
             if (dbOpponentCoords.Any())
             {
@@ -75,7 +77,7 @@ namespace BattleshipGame.API.Services.Controllers
                     if (!coord.IsEmpty)
                     {
                         coord.IsHitted = true;
-                        hittedShipsCoords.Add($"{coord.X}, {coord.Y}");
+                        hitShipsCoords.Add($"{coord.X}, {coord.Y}");
 
                         // logika sprawdzenia, czy statek został zatopiony
                         continue;
@@ -94,7 +96,25 @@ namespace BattleshipGame.API.Services.Controllers
             await _fieldRepository.SaveChangesAsync();
             await _playersRepository.SaveChangesAsync();
 
-            return hittedShipsCoords;
+            CombinedResponseData combinedObject = new CombinedResponseData();
+
+            if (hitShipsCoords.Count > 0)
+            {
+                string message = _message.ShotSuccess(hitShipsCoords.Count, hitShipsCoords);
+                var data = new JsonResult(hitShipsCoords);
+                combinedObject.Message = message;
+                combinedObject.JsonData = data.Value;
+
+                return combinedObject;
+            }
+
+            return combinedObject;
+        }
+
+        public class CombinedResponseData
+        {
+            public string Message { get; set; }
+            public object JsonData { get; set; }
         }
 
         public async Task<List<string>> SetRandomShootAndUpdateFields()

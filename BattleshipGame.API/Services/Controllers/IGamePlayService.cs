@@ -1,4 +1,5 @@
 ﻿using BattleshipGame.Data.Entities;
+using static BattleshipGame.API.Services.Controllers.GamePlayService;
 
 namespace BattleshipGame.API.Services.Controllers
 {
@@ -8,7 +9,7 @@ namespace BattleshipGame.API.Services.Controllers
 
         Task<string> PlayersAndCoordsNullCheck(string playerName, string coordinates);
 
-        Task<List<string>> UpdatePlayerFields(string playerName, string coordinates);
+        Task<CombinedResponseData> UpdatePlayerFields(string playerName, string coordinates);
 
         Task<string> FlagCheck(int value);
 
