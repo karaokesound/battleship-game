@@ -40,7 +40,7 @@ namespace BattleshipGame.API.Services.Controllers
             return players;
         }
 
-        public async Task<List<PlayerEntity>> ValidateAndGetPlayers(int key, string playerName)
+        public async Task<List<PlayerEntity>> GetPlayersAndValidate(int key, string playerName)
         {
             // Player2 (opponent) is being taken randomly from the database
 
@@ -51,11 +51,11 @@ namespace BattleshipGame.API.Services.Controllers
 
             if (key != 1 || player1 == null || player2 == null) return players; // Empty list
 
-            players.Add(player1);
-            players.Add(player2);
-
             player1.SunkenShips = 0;
+            players.Add(player1);
+
             player2.SunkenShips = 0;
+            players.Add(player2);
 
             await _playersRepository.SaveChangesAsync();
 
@@ -64,14 +64,14 @@ namespace BattleshipGame.API.Services.Controllers
 
         public async Task StartNewGame(List<PlayerEntity> players)
         {
-            // Deleting previous game data
+            // Deleting a previous game data
 
             _fieldRepository.DeleteAllFields();
             await _fieldRepository.SaveChangesAsync();
             _gameRepository.DeleteAllGames();
             await _gameRepository.SaveChangesAsync();
 
-            // Setting flag that Player1[our] takes first shoot
+            // Setting flag that Player1 takes the first shoot
 
             players[0].CanShoot = true;
             players[1].CanShoot = false;
@@ -80,7 +80,7 @@ namespace BattleshipGame.API.Services.Controllers
             await _gameRepository.AddNewGameAsync(players[0], players[1]);
             await _gameRepository.SaveChangesAsync();
 
-            // Creating game boards and adding them to the database
+            // Creating the game boards and adding them to the database
 
             var board1 = new GameCore(10, 10, 12, players[0].Name, _validation, _generatingService);
             var board2 = new GameCore(10, 10, 12, players[1].Name, _validation, _generatingService);

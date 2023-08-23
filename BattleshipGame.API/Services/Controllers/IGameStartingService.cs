@@ -6,7 +6,7 @@ namespace BattleshipGame.API.Services.Controllers
     {
         Task<List<PlayerEntity>> GetPlayers(string playerName);
 
-        Task<List<PlayerEntity>> ValidateAndGetPlayers(int key, string playerName);
+        Task<List<PlayerEntity>> GetPlayersAndValidate(int key, string playerName);
 
         Task StartNewGame(List<PlayerEntity> players);
     }

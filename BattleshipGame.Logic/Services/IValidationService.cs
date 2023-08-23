@@ -15,6 +15,6 @@ namespace BattleshipGame.Logic.Services
 
         List<int> ValidateCoordsFormatAndReturnId(string coordinates);
 
-        List<string> ValidateIfFieldsWereHit(List<FieldEntity> fields);
+        List<string> CheckIfFieldsWereHit(List<FieldEntity> fields);
     }
 }

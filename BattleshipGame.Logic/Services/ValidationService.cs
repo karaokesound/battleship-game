@@ -208,7 +208,7 @@ namespace BattleshipGame.Logic.Services
             return validCoords;
         }
 
-        public List<string> ValidateIfFieldsWereHit(List<FieldEntity> fields)
+        public List<string> CheckIfFieldsWereHit(List<FieldEntity> fields)
         {
             List<string> fieldsAlreadyHit = new List<string>();
 
@@ -219,7 +219,5 @@ namespace BattleshipGame.Logic.Services
 
             return fieldsAlreadyHit;
         }
-
-        
     }
 }

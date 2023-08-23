@@ -2,7 +2,6 @@
 using BattleshipGame.API.Services.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Reflection.Metadata.Ecma335;
 using static BattleshipGame.API.Services.Controllers.GamePlayService;
 
 namespace BattleshipGame.API.Controllers
@@ -29,7 +28,8 @@ namespace BattleshipGame.API.Controllers
             [SwaggerParameter(Description = "Coordinates in the format (x,y): 0,1 2,1")] string coordinates)
         {
             var players = await _service.GetPlayers();
-            var result = await _service.PlayersAndCoordsNullCheck(playerName, coordinates);
+
+            var result = await _service.PlayersAndCoordsValidation(playerName, coordinates);
 
             if (result != "") return BadRequest(result);
 
@@ -37,7 +37,9 @@ namespace BattleshipGame.API.Controllers
 
             if (result != "") return BadRequest(result);
 
-            List<string> fieldsAlreadyHit = await _service.CoordinatesCheck(coordinates);
+            // Checking if inserted coordinates were used in the previous rounds
+
+            List<string> fieldsAlreadyHit = await _service.GetHitFields(coordinates);
             List<string> allHitFields = await _service.GetAllHitFields(players[1].Name);
 
             if (fieldsAlreadyHit.Count > 0)
@@ -45,12 +47,14 @@ namespace BattleshipGame.API.Controllers
                 var jsonResult = new JsonResult(fieldsAlreadyHit);
                 var jsonResult2 = new JsonResult(allHitFields);
 
-                return BadRequest(new { Message = "This field was already hit! Hit field which wasn't used before. Hit field" +
-                    " are displayed below.",
+                return BadRequest(new { Message = "This field(s) was hit before! List of all hit fields is displayed below." +
+                    " Try with another coordinate!",
                     Data = jsonResult.Value, jsonResult2.Value });
             }
 
-            // Updating opponent player's fields and returning hit fields that had a ship on them
+            // Taking inserted coordinates and updating opponent player's gameboard. Additionally the method sets IsHitted property and
+            // count sunken ships by the player. If player hit any field with a ship on it, in "response" we will receive coordinates
+            // of all such fields
 
             CombinedResponseData response = await _service.UpdatePlayerFields(playerName, coordinates);
 
@@ -68,22 +72,17 @@ namespace BattleshipGame.API.Controllers
 
             if (result != "") return BadRequest(result);
 
-            // Setting random coordinates to shoot (computer move) and then updating player's (our) fields and
-            // returning hit fields that had a ship on them
+            // Setting random coordinates to shoot by computer and then updating player's gameboard. Additionally
+            // the method sets IsHitted property and count sunken ships by computer. If computer hit any field with
+            // a ship on it, in "response" we will receive coordinates of all such fields
 
-            var hittedShipsCoords = await _service.SetRandomShootAndUpdateFields();
+            CombinedResponseData response = await _service.SetRandomShootAndUpdateFields();
 
-            if (hittedShipsCoords.Count > 0)
-            {
-                var message = $"{players[1].Name} hit {hittedShipsCoords.Count} of your field(s). See details below.";
-                var jsonResult = new JsonResult(hittedShipsCoords);
-
-                return Ok(new { Message = message, Data = jsonResult.Value });
-            }
+            if (response.Message != null) return Ok(response);
 
             var refreshedGameBoard = await _service.RefreshGameBoard();
 
-            return Ok(new { Message = "Opponent missed", Data = refreshedGameBoard});
+            return Ok(new { Message = "Opponent has missed", Data = refreshedGameBoard });
         }
     }
 }

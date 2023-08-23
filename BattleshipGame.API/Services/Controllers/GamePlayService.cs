@@ -49,7 +49,7 @@ namespace BattleshipGame.API.Services.Controllers
             return players;
         }
 
-        public async Task<string> PlayersAndCoordsNullCheck(string playerName, string coordinates)
+        public async Task<string> PlayersAndCoordsValidation(string playerName, string coordinates)
         {
             var players = await GetPlayers();
 
@@ -66,6 +66,7 @@ namespace BattleshipGame.API.Services.Controllers
             var players = await GetPlayers();
 
             List<int> validCoordsId = _validation.ValidateCoordsFormatAndReturnId(coordinates);
+
             List<FieldEntity> dbOpponentCoords = await _fieldRepository.GetInsertedFields(validCoordsId, players[1].Name);
 
             List<string> hitShipsCoords = new List<string>();
@@ -79,6 +80,7 @@ namespace BattleshipGame.API.Services.Controllers
                     if (!coord.IsEmpty)
                     {
                         coord.IsHitted = true;
+
                         _fieldRepository.UpdateField(coord);
                         await _fieldRepository.SaveChangesAsync();
 
@@ -129,19 +131,14 @@ namespace BattleshipGame.API.Services.Controllers
             return combinedObject;
         }
 
-        public class CombinedResponseData
-        {
-            public string Message { get; set; }
-            public object JsonData { get; set; }
-        }
-
-        public async Task<List<string>> SetRandomShootAndUpdateFields()
+        public async Task<CombinedResponseData> SetRandomShootAndUpdateFields()
         {
             var players = await GetPlayers();
 
             // Set 3 random coords (computer move)
 
             List<int> randomCoordinates = _generatingService.GenerateRandomCoordinates(3);
+
             List<FieldEntity> dbOpponentCoords = await _fieldRepository.GetInsertedFields(randomCoordinates, players[0].Name);
 
             List<string> hitShipsCoords = new List<string>();
@@ -163,6 +160,7 @@ namespace BattleshipGame.API.Services.Controllers
                         await CountSunkenShips(coord, players[1]);
 
                         // Take the next loop
+
                         canTakeAnotherShoot = true;
                         continue;
                     }
@@ -185,25 +183,28 @@ namespace BattleshipGame.API.Services.Controllers
             await _fieldRepository.SaveChangesAsync();
             await _playersRepository.SaveChangesAsync();
 
-            return hitShipsCoords;
-        }
+            CombinedResponseData combinedObject = new CombinedResponseData();
 
-        public async Task<string> RefreshGameBoard()
-        {
-            var players = await GetPlayers();
-
-            var playerFields = await _fieldRepository.GetPlayerFieldsAsync(players[0].Name);
-            var mappedPlayerFields = new List<Field>();
-
-            foreach (var field in playerFields)
+            if (players[1].SunkenShips == 12)
             {
-                mappedPlayerFields.Add(_mapper.Map<Field>(field));
+                string message = "You've lost! The Opponent destroyed all your ships! Try again by setting new game.";
+                combinedObject.Message = message;
+                return combinedObject;
             }
 
-            var gameBoard = _generatingService.DisplayGameBoard(mappedPlayerFields, 10, 10);
+            if (hitShipsCoords.Count > 0)
+            {
+                string message = $"{players[1].Name} hit {hitShipsCoords.Count} of your field(s). See details below.";
+                var data = new JsonResult(hitShipsCoords);
+                combinedObject.Message = message;
+                combinedObject.JsonData = data.Value;
 
-            return gameBoard;
+                return combinedObject;
+            }
+
+            return combinedObject;
         }
+
         public async Task<string> FlagCheck(int value)
         {
             var players = await GetPlayers();
@@ -239,17 +240,19 @@ namespace BattleshipGame.API.Services.Controllers
             return message;
         }
 
-        public async Task<List<string>> CoordinatesCheck(string coordinates)
+        public async Task<List<string>> GetHitFields(string coordinates)
         {
             var players = await GetPlayers();
 
-            List<int> validCoordsId = _validation.ValidateCoordsFormatAndReturnId(coordinates);
-            List<FieldEntity> dbOpponentCoords = await _fieldRepository.GetInsertedFields(validCoordsId, players[1].Name);
+            List<int> coordinatesId = _validation.ValidateCoordsFormatAndReturnId(coordinates);
 
-            var usedFields = _validation.ValidateIfFieldsWereHit(dbOpponentCoords);
-            if (usedFields.Count > 0) return usedFields;
+            List<FieldEntity> dbOpponentCoords = await _fieldRepository.GetInsertedFields(coordinatesId, players[1].Name);
 
-            return usedFields; // Empty list
+            var hitFields = _validation.CheckIfFieldsWereHit(dbOpponentCoords);
+
+            if (hitFields.Count > 0) return hitFields;
+
+            return hitFields; // Empty list
         }
 
         public async Task<List<string>> GetAllHitFields(string playerName)
@@ -257,6 +260,24 @@ namespace BattleshipGame.API.Services.Controllers
             var fields = await _fieldRepository.GetHitFields(playerName);
 
             return fields;
+        }
+
+        public async Task<string> RefreshGameBoard()
+        {
+            var players = await GetPlayers();
+
+            var playerFields = await _fieldRepository.GetPlayerFieldsAsync(players[0].Name);
+
+            var mappedPlayerFields = new List<Field>();
+
+            foreach (var field in playerFields)
+            {
+                mappedPlayerFields.Add(_mapper.Map<Field>(field));
+            }
+
+            var gameBoard = _generatingService.DisplayGameBoard(mappedPlayerFields, 10, 10);
+
+            return gameBoard;
         }
 
         public async Task CountSunkenShips(FieldEntity coord, PlayerEntity player)
@@ -284,6 +305,12 @@ namespace BattleshipGame.API.Services.Controllers
                     }
                 }
             }
+        }
+
+        public class CombinedResponseData
+        {
+            public string Message { get; set; }
+            public object JsonData { get; set; }
         }
     }
 }
