@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BattleshipGame.API.Models.Player;
 using BattleshipGame.API.Services;
+using BattleshipGame.API.Services.Repositories;
 using BattleshipGame.Data.Entities;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;

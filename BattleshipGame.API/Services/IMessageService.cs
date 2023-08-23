@@ -8,8 +8,16 @@
 
         string Delete();
 
+        string StartGameError();
+
+        string StartGameSuccess(string opponent);
+
         string GameBoardNotFound();
 
-        string StartGameError();
+        string ShootError(string opponent, string key);
+
+        string ShotSuccess(int quantity, List<string> hitShipsCoords);
+
+        string ShotMissed();
     }
 }
