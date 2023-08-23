@@ -45,7 +45,7 @@ namespace BattleshipGame.Logic.Logic
 
         public void GenerateFields()
         {
-            Fields = _generatingService.GenerateFields(XField, YField, Player);
+            Fields = _generatingService.GeneratePlayerFields(XField, YField, Player);
         }
 
         public void GenerateShips(int numberOfShips)

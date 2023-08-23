@@ -5,7 +5,7 @@ namespace BattleshipGame.Logic.Services
 {
     public class GeneratingService : IGeneratingService
     {
-        public List<Field> GenerateFields(int XFields, int YFields, string player)
+        public List<Field> GeneratePlayerFields(int XFields, int YFields, string player)
         {
             List<Field> fieldsList = new List<Field>();
 
@@ -89,6 +89,21 @@ namespace BattleshipGame.Logic.Services
             }
 
             return gameBoard.ToString();
+        }
+
+        public List<int> GenerateRandomCoordinates(int amount)
+        {
+            List<int> coordinates = new List<int>();
+
+            Random random = new Random();
+
+            for (int i = 0; i < amount; i++)
+            {
+                coordinates.Add(random.Next(0, 9));
+                coordinates.Add(random.Next(0, 9));
+            }
+
+            return coordinates;
         }
     }
 }

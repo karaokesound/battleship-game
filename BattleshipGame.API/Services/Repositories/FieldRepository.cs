@@ -33,14 +33,14 @@ namespace BattleshipGame.API.Services.Repositories
                 .ToListAsync();
         }
 
-        public async Task<List<FieldEntity>> GetInsertedFields(List<int> insertedFields, string opponent)
+        public async Task<List<FieldEntity>> GetInsertedFields(List<int> insertedFields, string playerName)
         {
             List<FieldEntity> fields = new List<FieldEntity>();
 
             for (int coordinate = 0; coordinate < insertedFields.Count; coordinate++)
             {
                 FieldEntity field = await GetPlayerFieldAsync
-                    (opponent, insertedFields[coordinate], insertedFields[coordinate + 1]);
+                    (playerName, insertedFields[coordinate], insertedFields[coordinate + 1]);
 
                 fields.Add(field);
                 coordinate++;

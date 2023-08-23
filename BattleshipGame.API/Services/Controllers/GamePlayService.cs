@@ -66,7 +66,6 @@ namespace BattleshipGame.API.Services.Controllers
             // Validating coordinates
 
             List<int> validCoordsId = _validation.CoordinatesValidation(coordinates);
-
             List<FieldEntity> dbOpponentCoords = await _fieldRepository.GetInsertedFields(validCoordsId, players[1].Name);
 
             List<string> hittedShipsCoords = new List<string>();
@@ -101,50 +100,16 @@ namespace BattleshipGame.API.Services.Controllers
             return hittedShipsCoords;
         }
 
-        public async Task<string> FlagCheck(int value)
-        {
-            var players = await GetPlayers();
-
-            PlayerEntity selectedPlayer = null;
-            PlayerEntity secondPlayer = null;
-
-            // Player
-
-            if (value == 0)
-            {
-                selectedPlayer = players[0];
-                secondPlayer = players[1];
-            }
-
-            // Opponent
-
-            if (value == 1)
-            {
-                selectedPlayer = players[1];
-                secondPlayer = players[0];
-            }
-
-            if (selectedPlayer == null || secondPlayer == null)
-            {
-                return _message.PlayerNotFoundMessage();
-            }
-
-            string message = "";
-
-            if (!selectedPlayer.CanShoot) message = $"Sorry! This operations can't be done. Now it's {secondPlayer.Name} turn";
-
-            return message;
-        }
-
         public async Task<List<string>> SetRandomShootAndUpdateFields()
         {
             var players = await GetPlayers();
 
-            // Set random coords
+            // Set 3 random coords (computer move)
 
-            Random random = new Random();
-            int randomX = random.Next(0, 9);
-            int randomY = random.Next(0, 9);
+            List<int> randomCoordinates = new List<int>();
+
+            randomCoordinates = _generatingService.GenerateRandomCoordinates(3);
+            var dbOpponentCoords = _fieldRepository.GetInsertedFields(randomCoordinates, players[0].Name);
 
             List<FieldEntity> fieldsToUpdate = new List<FieldEntity>();
             List<string> hittedFields = new List<string>();
@@ -192,6 +157,40 @@ namespace BattleshipGame.API.Services.Controllers
             var gameBoard = _generatingService.DisplayGameBoard(mappedPlayerFields, 10, 10);
 
             return gameBoard;
+        }
+        public async Task<string> FlagCheck(int value)
+        {
+            var players = await GetPlayers();
+
+            PlayerEntity selectedPlayer = null;
+            PlayerEntity secondPlayer = null;
+
+            // Player
+
+            if (value == 0)
+            {
+                selectedPlayer = players[0];
+                secondPlayer = players[1];
+            }
+
+            // Opponent
+
+            if (value == 1)
+            {
+                selectedPlayer = players[1];
+                secondPlayer = players[0];
+            }
+
+            if (selectedPlayer == null || secondPlayer == null)
+            {
+                return _message.PlayerNotFoundMessage();
+            }
+
+            string message = "";
+
+            if (!selectedPlayer.CanShoot) message = $"Sorry! This operations can't be done. Now it's {secondPlayer.Name} turn";
+
+            return message;
         }
     }
 }

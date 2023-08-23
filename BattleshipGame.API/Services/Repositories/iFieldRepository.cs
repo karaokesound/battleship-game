@@ -9,7 +9,7 @@ namespace BattleshipGame.API.Services.Repositories
 
         Task<List<FieldEntity>> GetPlayerFieldsAsync(string player);
 
-        Task<List<FieldEntity>> GetInsertedFields(List<int> insertedFields, string opponent);
+        Task<List<FieldEntity>> GetInsertedFields(List<int> insertedFields, string playerName);
 
         Task<List<string>> GetCurrentPlayersByFieldsAsync();
 
