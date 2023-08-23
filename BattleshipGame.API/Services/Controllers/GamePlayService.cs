@@ -78,16 +78,15 @@ namespace BattleshipGame.API.Services.Controllers
                         hittedShipsCoords.Add($"{coord.X}, {coord.Y}");
 
                         // logika sprawdzenia, czy statek został zatopiony
+                        continue;
                     }
 
                     coord.IsHitted = true;
+
+                    players[0].CanShoot = true ? false : true;
+                    players[1].CanShoot = false ? false : true;
                 }
             }
-
-            // Changing the flag
-
-            players[0].CanShoot = true ? false : true;
-            players[1].CanShoot = false ? false : true;
 
             // Database updating
 
