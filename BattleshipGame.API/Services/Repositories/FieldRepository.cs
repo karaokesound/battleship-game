@@ -82,6 +82,7 @@ namespace BattleshipGame.API.Services.Repositories
                     X = field.X,
                     Y = field.Y,
                     ShipSize = field.ShipSize,
+                    ShipId = field.ShipId,
                     IsEmpty = field.IsEmpty,
                     IsHitted = field.IsHitted,
                     IsValid = field.IsValid,

@@ -4,9 +4,12 @@
     {
         public int Size { get; set; }
 
-        public Ship(int size)
+        public int Id { get; set; }
+
+        public Ship(int size, int id)
         {
             Size = size;
+            Id = id;
         }
     }
 }

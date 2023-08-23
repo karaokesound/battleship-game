@@ -32,7 +32,7 @@ namespace BattleshipGame.Logic.Services
 
             for (int i = 0; i < 5; i++)
             {
-                shipsList.Add(new Ship(1));
+                shipsList.Add(new Ship(1, i));
             }
 
             if (shipsList.Count >= numberOfShips) return shipsList;
@@ -41,7 +41,7 @@ namespace BattleshipGame.Logic.Services
 
             for (int i = 0; i < 4; i++)
             {
-                shipsList.Add(new Ship(2));
+                shipsList.Add(new Ship(2, i+5));
             }
 
             if (shipsList.Count >= numberOfShips) return shipsList;
@@ -50,7 +50,7 @@ namespace BattleshipGame.Logic.Services
 
             for (int i = 0; i < 3; i++)
             {
-                shipsList.Add(new Ship(3));
+                shipsList.Add(new Ship(3, i+9));
             }
 
             if (shipsList.Count >= numberOfShips) return shipsList;
@@ -59,7 +59,7 @@ namespace BattleshipGame.Logic.Services
 
             for (int i = 0; i < 2; i++)
             {
-                shipsList.Add(new Ship(4));
+                shipsList.Add(new Ship(4, i+12));
             }
 
             if (shipsList.Count >= numberOfShips) return shipsList;

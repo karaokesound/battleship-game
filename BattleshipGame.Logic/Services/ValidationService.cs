@@ -5,7 +5,7 @@ namespace BattleshipGame.Logic.Services
 {
     public class ValidationService : IValidationService
     {
-        public bool OneFieldShipValidation(int startX, int startY, int endX, int endY, List<Field> allFields, string username)
+        public bool OneFieldShipValidation(int startX, int startY, int endX, int endY, List<Field> allFields, string username, int shipId)
         {
             var selectedField = allFields.FirstOrDefault(xy => xy.X == startX && xy.Y == startY);
 
@@ -18,6 +18,7 @@ namespace BattleshipGame.Logic.Services
 
             selectedField.IsEmpty = false;
             selectedField.ShipSize = 1;
+            selectedField.ShipId = shipId;
             selectedField.Player = username;
 
             // Finds invalid fields and adjusts their IsValid property to false.
@@ -40,7 +41,7 @@ namespace BattleshipGame.Logic.Services
             return true;
         }
 
-        public bool TwoFieldShipValidation(int startX, int startY, int endX, int endY, List<Field> allFields, string username)
+        public bool TwoFieldShipValidation(int startX, int startY, int endX, int endY, List<Field> allFields, string username, int shipId)
         {
             var selectedFields = allFields.FindAll(f => f.X == startX && f.Y == startY
                || f.X == endX && f.Y == endY)
@@ -57,6 +58,7 @@ namespace BattleshipGame.Logic.Services
             {
                 field.IsEmpty = false;
                 field.ShipSize = 2;
+                field.ShipId = shipId;
                 field.Player = username;
             }
 
@@ -79,7 +81,7 @@ namespace BattleshipGame.Logic.Services
             return true;
         }
 
-        public bool ThreeFieldShipValidation(int startX, int startY, int endX, int endY, List<Field> allFields, string username)
+        public bool ThreeFieldShipValidation(int startX, int startY, int endX, int endY, List<Field> allFields, string username, int shipId)
         {
             var selectedFields = allFields.FindAll(f => (f.X == startX && f.Y == startY)
                 || f.X == endX && f.Y == endY
@@ -98,6 +100,7 @@ namespace BattleshipGame.Logic.Services
             {
                 field.IsEmpty = false;
                 field.ShipSize = 3;
+                field.ShipId = shipId;
                 field.Player = username;
             }
 
@@ -120,7 +123,7 @@ namespace BattleshipGame.Logic.Services
             return true;
         }
 
-        public bool FourFieldShipValidation(int startX, int startY, int endX, int endY, List<Field> allFields, string username)
+        public bool FourFieldShipValidation(int startX, int startY, int endX, int endY, List<Field> allFields, string username, int shipId)
         {
             var selectedFields = new List<Field>();
 
@@ -147,6 +150,7 @@ namespace BattleshipGame.Logic.Services
             {
                 field.IsEmpty = false;
                 field.ShipSize = 4;
+                field.ShipId = shipId;
                 field.Player = username;
             }
 

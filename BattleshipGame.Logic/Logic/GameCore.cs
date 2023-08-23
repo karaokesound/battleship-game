@@ -74,42 +74,42 @@ namespace BattleshipGame.Logic.Logic
                     bool verticalHorizontal = random.Next(4) != 0;
                     bool mixedDirection = random.Next(2) == 0 ? true : false;
 
-                    if (ship.Size == 4)
-                    {
-                        // horizontal
+                    //if (ship.Size == 4)
+                    //{
+                    //    // horizontal
 
-                        if (!verticalHorizontal && !mixedDirection)
-                        {
-                            if (startX > 3)
-                            {
-                                endX = startX - 3;
-                                endY = startY;
-                            }
+                    //    if (!verticalHorizontal && !mixedDirection)
+                    //    {
+                    //        if (startX > 3)
+                    //        {
+                    //            endX = startX - 3;
+                    //            endY = startY;
+                    //        }
 
-                            endX = startX + 3;
-                            endY = startY;
-                        }
+                    //        endX = startX + 3;
+                    //        endY = startY;
+                    //    }
 
-                        // vertical
+                    //    // vertical
 
-                        else if (verticalHorizontal && !mixedDirection)
-                        {
-                            if (startY > 3)
-                            {
-                                endY = startY - 3;
-                                endX = startX;
-                            }
+                    //    else if (verticalHorizontal && !mixedDirection)
+                    //    {
+                    //        if (startY > 3)
+                    //        {
+                    //            endY = startY - 3;
+                    //            endX = startX;
+                    //        }
 
-                            endY = startY + 3;
-                            endX = startX;
-                        }
+                    //        endY = startY + 3;
+                    //        endX = startX;
+                    //    }
 
-                        if (ValidateFields(ship, startX, startY, endX, endY))
-                        {
-                            break;
-                        }
-                        tryCount++;
-                    }
+                    //    if (ValidateFields(ship, startX, startY, endX, endY))
+                    //    {
+                    //        break;
+                    //    }
+                    //    tryCount++;
+                    //}
                     if (ship.Size == 3)
                     {
                         if (!verticalHorizontal && tripleShipDirection == 1)
@@ -174,22 +174,22 @@ namespace BattleshipGame.Logic.Logic
         {
             if (ship.Size == 1)
             {
-                return _validation.OneFieldShipValidation(startX, startY, endX, endY, Fields, Player);
+                return _validation.OneFieldShipValidation(startX, startY, endX, endY, Fields, Player, ship.Id);
             }
 
             if (ship.Size == 2)
             {
-                return _validation.TwoFieldShipValidation(startX, startY, endX, endY, Fields, Player);
+                return _validation.TwoFieldShipValidation(startX, startY, endX, endY, Fields, Player, ship.Id);
             }
 
             if (ship.Size == 3)
             {
-                return _validation.ThreeFieldShipValidation(startX, startY, endX, endY, Fields, Player);
+                return _validation.ThreeFieldShipValidation(startX, startY, endX, endY, Fields, Player, ship.Id);
             }
 
             if (ship.Size == 4)
             {
-                return _validation.FourFieldShipValidation(startX, startY, endX, endY, Fields, Player);
+                return _validation.FourFieldShipValidation(startX, startY, endX, endY, Fields, Player, ship.Id);
             }
 
             return false;
