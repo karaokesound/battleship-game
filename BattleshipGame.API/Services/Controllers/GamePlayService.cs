@@ -72,6 +72,8 @@ namespace BattleshipGame.API.Services.Controllers
 
             if (dbOpponentCoords.Any())
             {
+                bool canTakeAnotherShoot = false;
+
                 foreach (var coord in dbOpponentCoords)
                 {
                     if (!coord.IsEmpty)
@@ -85,11 +87,15 @@ namespace BattleshipGame.API.Services.Controllers
                         await CountSunkenShips(coord, players[0]);
 
                         // Take the next loop
+                        canTakeAnotherShoot = true;
                         continue;
                     }
 
                     coord.IsHitted = true;
+                }
 
+                if (!canTakeAnotherShoot)
+                {
                     players[0].CanShoot = true ? false : true;
                     players[1].CanShoot = false ? false : true;
                 }
@@ -140,29 +146,38 @@ namespace BattleshipGame.API.Services.Controllers
 
             List<string> hitShipsCoords = new List<string>();
 
-            foreach (var coord in dbOpponentCoords)
+            if (dbOpponentCoords.Any())
             {
-                if (!coord.IsEmpty)
+                bool canTakeAnotherShoot = false;
+
+                foreach (var coord in dbOpponentCoords)
                 {
+                    if (!coord.IsEmpty)
+                    {
+                        coord.IsHitted = true;
+                        _fieldRepository.UpdateField(coord);
+                        await _fieldRepository.SaveChangesAsync();
+
+                        hitShipsCoords.Add($"(X, Y) : ({coord.X}, {coord.Y})");
+
+                        await CountSunkenShips(coord, players[1]);
+
+                        // Take the next loop
+                        canTakeAnotherShoot = true;
+                        continue;
+                    }
+
                     coord.IsHitted = true;
-                    _fieldRepository.UpdateField(coord);
-                    await _fieldRepository.SaveChangesAsync();
-
-                    hitShipsCoords.Add($"(X, Y) : ({coord.X}, {coord.Y})");
-
-                    await CountSunkenShips(coord, players[1]);
-
-                    // Take the next loop
-                    continue;
                 }
 
-                coord.IsHitted = true;
+                // Changing the flag
+
+                if (!canTakeAnotherShoot)
+                {
+                    players[1].CanShoot = true ? false : true;
+                    players[0].CanShoot = false ? false : true;
+                }
             }
-
-            // Changing the flag
-
-            players[1].CanShoot = true ? false : true;
-            players[0].CanShoot = false ? false : true;
 
             // Database updating
 
