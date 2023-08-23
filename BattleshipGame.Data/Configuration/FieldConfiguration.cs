@@ -19,6 +19,9 @@ namespace BattleshipGame.Data.Configuration
             builder.Property(f => f.ShipSize)
                 .IsRequired();
 
+            builder.Property(f => f.ShipId)
+                .IsRequired();
+
             builder.Property(f => f.IsEmpty)
                 .IsRequired();
 

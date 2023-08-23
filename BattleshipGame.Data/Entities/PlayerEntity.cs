@@ -10,6 +10,8 @@
 
         public int Game { get; set; }
 
+        public int SunkenShips { get; set; }
+
         public bool CanShoot { get; set; }
 
         public ICollection<FieldEntity> GameBoard { get; set; }

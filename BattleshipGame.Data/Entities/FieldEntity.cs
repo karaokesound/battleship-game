@@ -10,6 +10,8 @@
 
         public int ShipSize { get; set; }
 
+        public int ShipId { get; set; }
+
         public bool IsEmpty { get; set; }
 
         public bool IsHitted { get; set; }
