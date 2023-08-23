@@ -1,5 +1,6 @@
 ﻿using BattleshipGame.API.Models.Game;
 using BattleshipGame.Data.Entities;
+using System.Drawing;
 
 namespace BattleshipGame.Logic.Services
 {
@@ -218,5 +219,7 @@ namespace BattleshipGame.Logic.Services
 
             return fieldsAlreadyHit;
         }
+
+        
     }
 }

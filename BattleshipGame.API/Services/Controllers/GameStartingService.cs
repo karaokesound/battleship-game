@@ -9,13 +9,13 @@ namespace BattleshipGame.API.Services.Controllers
     {
         private readonly IPlayersRepository _playersRepository;
         private readonly IGameRepository _gameRepository;
-        private readonly iFieldRepository _fieldRepository;
+        private readonly IFieldRepository _fieldRepository;
         private readonly IValidationService _validation;
         private readonly IGeneratingService _generatingService;
 
         public GameStartingService(IPlayersRepository playersRepository,
             IGameRepository gameRepository,
-            iFieldRepository fieldRepository,
+            IFieldRepository fieldRepository,
             IValidationService validation,
             IGeneratingService generatingService)
         {
@@ -53,6 +53,11 @@ namespace BattleshipGame.API.Services.Controllers
 
             players.Add(player1);
             players.Add(player2);
+
+            player1.SunkenShips = 0;
+            player2.SunkenShips = 0;
+
+            await _playersRepository.SaveChangesAsync();
 
             return players;
         }

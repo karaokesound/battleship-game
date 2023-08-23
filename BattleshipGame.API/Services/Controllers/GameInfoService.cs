@@ -9,13 +9,13 @@ namespace BattleshipGame.API.Services.Controllers
     {
         private readonly IGameRepository _gameRepository;
         private readonly IPlayersRepository _playersRepository;
-        private readonly iFieldRepository _fieldRepository;
+        private readonly IFieldRepository _fieldRepository;
         private readonly IGeneratingService _generatingService;
         private readonly IMapper _mapper;
 
         public GameInfoService(IGameRepository gameRepository,
             IPlayersRepository playersRepository,
-            iFieldRepository fieldRepository,
+            IFieldRepository fieldRepository,
             IGeneratingService generatingService,
             IMapper mapper)
         {

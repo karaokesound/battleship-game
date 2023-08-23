@@ -12,7 +12,7 @@ namespace BattleshipGame.API.Services.Controllers
     {
         private readonly IGameRepository _gameRepository;
         private readonly IPlayersRepository _playersRepository;
-        private readonly iFieldRepository _fieldRepository;
+        private readonly IFieldRepository _fieldRepository;
         private readonly IValidationService _validation;
         private readonly IMessageService _message;
         private readonly IGeneratingService _generatingService;
@@ -20,7 +20,7 @@ namespace BattleshipGame.API.Services.Controllers
 
         public GamePlayService(IGameRepository gameRepository,
             IPlayersRepository playersRepository,
-            iFieldRepository fieldRepository,
+            IFieldRepository fieldRepository,
             IValidationService validation,
             IMessageService message,
             IGeneratingService generatingService,
@@ -77,9 +77,14 @@ namespace BattleshipGame.API.Services.Controllers
                     if (!coord.IsEmpty)
                     {
                         coord.IsHitted = true;
+                        _fieldRepository.UpdateField(coord);
+                        await _fieldRepository.SaveChangesAsync();
+
                         hitShipsCoords.Add($"{coord.X}, {coord.Y}");
 
-                        // logika sprawdzenia, czy statek został zatopiony
+                        await CountSunkenShips(coord, players[0]);
+
+                        // Take the next loop
                         continue;
                     }
 
@@ -97,6 +102,13 @@ namespace BattleshipGame.API.Services.Controllers
             await _playersRepository.SaveChangesAsync();
 
             CombinedResponseData combinedObject = new CombinedResponseData();
+
+            if (players[0].SunkenShips == 12)
+            {
+                string message = "Congratulate! You've won the game!";
+                combinedObject.Message = message;
+                return combinedObject;
+            }
 
             if (hitShipsCoords.Count > 0)
             {
@@ -126,14 +138,22 @@ namespace BattleshipGame.API.Services.Controllers
             List<int> randomCoordinates = _generatingService.GenerateRandomCoordinates(3);
             List<FieldEntity> dbOpponentCoords = await _fieldRepository.GetInsertedFields(randomCoordinates, players[0].Name);
 
-            List<string> hittedShipsCoords = new List<string>();
+            List<string> hitShipsCoords = new List<string>();
 
             foreach (var coord in dbOpponentCoords)
             {
                 if (!coord.IsEmpty)
                 {
                     coord.IsHitted = true;
-                    hittedShipsCoords.Add($"(X, Y) : ({coord.X}, {coord.Y})");
+                    _fieldRepository.UpdateField(coord);
+                    await _fieldRepository.SaveChangesAsync();
+
+                    hitShipsCoords.Add($"(X, Y) : ({coord.X}, {coord.Y})");
+
+                    await CountSunkenShips(coord, players[1]);
+
+                    // Take the next loop
+                    continue;
                 }
 
                 coord.IsHitted = true;
@@ -150,7 +170,7 @@ namespace BattleshipGame.API.Services.Controllers
             await _fieldRepository.SaveChangesAsync();
             await _playersRepository.SaveChangesAsync();
 
-            return hittedShipsCoords;
+            return hitShipsCoords;
         }
 
         public async Task<string> RefreshGameBoard()
@@ -222,6 +242,33 @@ namespace BattleshipGame.API.Services.Controllers
             var fields = await _fieldRepository.GetHitFields(playerName);
 
             return fields;
+        }
+
+        public async Task CountSunkenShips(FieldEntity coord, PlayerEntity player)
+        {
+            if (!coord.IsEmpty)
+            {
+                if (coord.ShipSize == 1)
+                {
+                    player.SunkenShips += 1;
+                }
+                if (coord.ShipSize == 2)
+                {
+                    int amount = await _fieldRepository.GetNumberOfFieldsWithShipId(coord);
+                    if (amount == 2)
+                    {
+                        player.SunkenShips += 1;
+                    }
+                }
+                if (coord.ShipSize == 3)
+                {
+                    int amount = await _fieldRepository.GetNumberOfFieldsWithShipId(coord);
+                    if (amount == 3)
+                    {
+                        player.SunkenShips += 1;
+                    }
+                }
+            }
         }
     }
 }

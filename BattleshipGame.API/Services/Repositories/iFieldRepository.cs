@@ -3,7 +3,7 @@ using BattleshipGame.Data.Entities;
 
 namespace BattleshipGame.API.Services.Repositories
 {
-    public interface iFieldRepository
+    public interface IFieldRepository
     {
         Task<FieldEntity> GetPlayerFieldAsync(string player, int x, int y);
 
@@ -15,9 +15,13 @@ namespace BattleshipGame.API.Services.Repositories
 
         Task<List<string>> GetHitFields(string playerName);
 
+        Task<int> GetNumberOfFieldsWithShipId(FieldEntity field);
+
         Task<bool> AddFieldAsync(Field field, PlayerEntity player);
 
         void UpdateFields(List<FieldEntity> hittedFields);
+
+        void UpdateField(FieldEntity hittedField);
 
         void DeleteAllFields();
 

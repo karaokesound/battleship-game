@@ -35,7 +35,7 @@ builder.Services.AddSingleton<IMessageService, MessageService>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddSingleton<IValidationService, ValidationService>();
 builder.Services.AddSingleton<IGeneratingService, GeneratingService>();
-builder.Services.AddScoped<iFieldRepository, FieldRepository>();
+builder.Services.AddScoped<IFieldRepository, FieldRepository>();
 builder.Services.AddScoped<IGameRepository, GameRepository>();
 builder.Services.AddScoped<IGameStartingService, GameStartingService>();
 builder.Services.AddScoped<IGameInfoService, GameInfoService>();

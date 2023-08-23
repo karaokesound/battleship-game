@@ -2,12 +2,10 @@
 using BattleshipGame.Data.DbContexts;
 using BattleshipGame.Data.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel;
-using System.Numerics;
 
 namespace BattleshipGame.API.Services.Repositories
 {
-    public class FieldRepository : iFieldRepository
+    public class FieldRepository : IFieldRepository
     {
         private readonly BattleshipGameDbContext _context;
 
@@ -74,6 +72,14 @@ namespace BattleshipGame.API.Services.Repositories
             return fields;
         }
 
+        public async Task<int> GetNumberOfFieldsWithShipId(FieldEntity field)
+        {
+            return await _context.Fields
+                .CountAsync(f => f.ShipId == field.ShipId 
+                && f.Player.Name == field.Player.Name
+                && f.IsHitted == true);
+        }
+
         public async Task<bool> AddFieldAsync(Field field, PlayerEntity player)
         {
             _context.Fields.Add(
@@ -103,6 +109,15 @@ namespace BattleshipGame.API.Services.Repositories
 
                 xy.IsHitted = true;
             }
+        }
+
+        public void UpdateField(FieldEntity hittedField)
+        {
+            var field = _context.Fields.FirstOrDefault(f => f.X == hittedField.X
+            && f.Y == hittedField.Y
+            && f.Player == hittedField.Player);
+
+            field.IsHitted = true;
         }
 
         public void DeleteAllFields()
