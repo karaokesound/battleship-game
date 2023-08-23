@@ -6,12 +6,14 @@ namespace BattleshipGame.API.Services.Controllers
     {
         Task<List<PlayerEntity>> GetPlayers();
 
-        Task<string> ValidatePlayersAndCoordinates(string playerName, string coordinates);
+        Task<string> PlayersAndCoordsNullCheck(string playerName, string coordinates);
 
         Task<List<string>> UpdatePlayerFields(string playerName, string coordinates);
 
-        Task<string> ValidateOpponentTurn();
+        Task<string> FlagCheck(int value);
 
-        Task<List<string>> SetRandomShotByOpponent();
+        Task<List<string>> SetRandomShootAndUpdateFields();
+
+        Task<string> RefreshGameBoard();
     }
 }

@@ -27,9 +27,9 @@ namespace BattleshipGame.API.Controllers
             [SwaggerParameter(Description = "Insert 1 to start the game.")] int key,
             [SwaggerParameter(Description = "Insert your nickname.")] string playerName)
         {
-            var players = await _service.ValidateAndReturnPlayers(key, playerName);
+            var players = await _service.ValidateAndGetPlayers(key, playerName);
 
-            if (players == null || players.Count == 0) return BadRequest(_message.StartGameError());
+            if (players.Count == 0) return BadRequest(_message.StartGameError());
 
             // Starting new game
 

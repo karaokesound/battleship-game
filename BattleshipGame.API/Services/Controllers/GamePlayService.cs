@@ -1,11 +1,8 @@
 ﻿using AutoMapper;
+using BattleshipGame.API.Models.Game;
 using BattleshipGame.API.Services.Repositories;
 using BattleshipGame.Data.Entities;
 using BattleshipGame.Logic.Services;
-using Microsoft.AspNetCore.Mvc;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
-using System.ComponentModel;
-using System.Numerics;
 
 namespace BattleshipGame.API.Services.Controllers
 {
@@ -14,26 +11,26 @@ namespace BattleshipGame.API.Services.Controllers
         private readonly IGameRepository _gameRepository;
         private readonly IPlayersRepository _playersRepository;
         private readonly iFieldRepository _fieldRepository;
-        private readonly IGeneratingService _generatingService;
         private readonly IValidationService _validation;
-        private readonly IMapper _mapper;
         private readonly IMessageService _message;
+        private readonly IGeneratingService _generatingService;
+        private readonly IMapper _mapper;
 
         public GamePlayService(IGameRepository gameRepository,
             IPlayersRepository playersRepository,
             iFieldRepository fieldRepository,
-            IGeneratingService generatingService,
             IValidationService validation,
-            IMapper mapper,
-            IMessageService message)
+            IMessageService message,
+            IGeneratingService generatingService,
+            IMapper mapper)
         {
             _gameRepository = gameRepository;
             _playersRepository = playersRepository;
             _fieldRepository = fieldRepository;
-            _generatingService = generatingService;
             _validation = validation;
-            _mapper = mapper;
             _message = message;
+            _generatingService = generatingService;
+            _mapper = mapper;
         }
 
         public async Task<List<PlayerEntity>> GetPlayers()
@@ -50,18 +47,15 @@ namespace BattleshipGame.API.Services.Controllers
             return players;
         }
 
-        public async Task<string> ValidatePlayersAndCoordinates(string playerName, string coordinates)
+        public async Task<string> PlayersAndCoordsNullCheck(string playerName, string coordinates)
         {
-            var playersIds = await _gameRepository.GetPlayersIds();
-            var player = await _playersRepository.GetPlayerAsync(playersIds[0]);
-            var opponent = await _playersRepository.GetPlayerAsync(playersIds[1]);
+            var players = await GetPlayers();
 
-            if (string.IsNullOrEmpty(coordinates) || player == null || playerName != player.Name)
+            if (string.IsNullOrEmpty(coordinates) || players[0] == null || players[1] == null || players[0].Name != playerName)
             {
-                return _message.ShootError(opponent.Name, "0");
+                return _message.ShootError(players[1].Name, "0");
             }
 
-            if (!player.CanShoot) return _message.ShootError(opponent.Name, "1");
             return "";
         }
 
@@ -73,13 +67,13 @@ namespace BattleshipGame.API.Services.Controllers
 
             List<int> validCoordsId = _validation.CoordinatesValidation(coordinates);
 
-            List<FieldEntity> dbValidCoords = await _fieldRepository.GetInsertedFields(validCoordsId, players[1].Name);
+            List<FieldEntity> dbOpponentCoords = await _fieldRepository.GetInsertedFields(validCoordsId, players[1].Name);
 
             List<string> hittedShipsCoords = new List<string>();
 
-            if (dbValidCoords.Any())
+            if (dbOpponentCoords.Any())
             {
-                foreach (var coord in dbValidCoords)
+                foreach (var coord in dbOpponentCoords)
                 {
                     if (!coord.IsEmpty)
                     {
@@ -100,32 +94,53 @@ namespace BattleshipGame.API.Services.Controllers
 
             // Database updating
 
-            _fieldRepository.UpdateFields(dbValidCoords);
+            _fieldRepository.UpdateFields(dbOpponentCoords);
             await _fieldRepository.SaveChangesAsync();
             await _playersRepository.SaveChangesAsync();
 
             return hittedShipsCoords;
         }
 
-        public async Task<string> ValidateOpponentTurn()
+        public async Task<string> FlagCheck(int value)
         {
             var players = await GetPlayers();
 
-            if (players[1] == null)
+            PlayerEntity selectedPlayer = null;
+            PlayerEntity secondPlayer = null;
+
+            // Player
+
+            if (value == 0)
+            {
+                selectedPlayer = players[0];
+                secondPlayer = players[1];
+            }
+
+            // Opponent
+
+            if (value == 1)
+            {
+                selectedPlayer = players[1];
+                secondPlayer = players[0];
+            }
+
+            if (selectedPlayer == null || secondPlayer == null)
             {
                 return _message.PlayerNotFoundMessage();
             }
 
             string message = "";
 
-            if (!players[1].CanShoot) message = $"Sorry! This operations can't be done. Now it's {players[0].Name} turn";
+            if (!selectedPlayer.CanShoot) message = $"Sorry! This operations can't be done. Now it's {secondPlayer.Name} turn";
 
             return message;
         }
 
-        public async Task<List<string>> SetRandomShotByOpponent()
+        public async Task<List<string>> SetRandomShootAndUpdateFields()
         {
             var players = await GetPlayers();
+
+            // Set random coords
 
             Random random = new Random();
             int randomX = random.Next(0, 9);
@@ -147,12 +162,36 @@ namespace BattleshipGame.API.Services.Controllers
                 hittedFields.Add($"(X, Y) : ({field.X}, {field.Y})");
             }
 
+            // Changing the flag
+
             players[1].CanShoot = true ? false : true;
             players[0].CanShoot = false ? false : true;
 
+
+            // Database updating
+
+            _fieldRepository.UpdateFields(fieldsToUpdate);
+            await _fieldRepository.SaveChangesAsync();
             await _playersRepository.SaveChangesAsync();
 
             return hittedFields;
+        }
+
+        public async Task<string> RefreshGameBoard()
+        {
+            var players = await GetPlayers();
+
+            var playerFields = await _fieldRepository.GetPlayerFieldsAsync(players[0].Name);
+            var mappedPlayerFields = new List<Field>();
+
+            foreach (var field in playerFields)
+            {
+                mappedPlayerFields.Add(_mapper.Map<Field>(field));
+            }
+
+            var gameBoard = _generatingService.DisplayGameBoard(mappedPlayerFields, 10, 10);
+
+            return gameBoard;
         }
     }
 }

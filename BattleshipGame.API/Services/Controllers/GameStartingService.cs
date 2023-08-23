@@ -2,7 +2,6 @@
 using BattleshipGame.Data.Entities;
 using BattleshipGame.Logic.Logic;
 using BattleshipGame.Logic.Services;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace BattleshipGame.API.Services.Controllers
 {
@@ -41,17 +40,19 @@ namespace BattleshipGame.API.Services.Controllers
             return players;
         }
 
-        public async Task<List<PlayerEntity>> ValidateAndReturnPlayers(int key, string playerName)
+        public async Task<List<PlayerEntity>> ValidateAndGetPlayers(int key, string playerName)
         {
+            // Player2 (opponent) is being taken randomly from the database
+
             List<PlayerEntity> players = new List<PlayerEntity>();
 
             PlayerEntity player1 = await _playersRepository.GetPlayerByNameAsync(playerName);
             PlayerEntity player2 = await _playersRepository.GetRandomPlayerAsync(playerName);
 
+            if (key != 1 || player1 == null || player2 == null) return players; // Empty list
+
             players.Add(player1);
             players.Add(player2);
-
-            if (key != 1 || players[0] == null || players[1] == null) return players; // Empty list
 
             return players;
         }
@@ -65,12 +66,12 @@ namespace BattleshipGame.API.Services.Controllers
             _gameRepository.DeleteAllGames();
             await _gameRepository.SaveChangesAsync();
 
-            // Forcing that Player1[our] takes first shoot
+            // Setting flag that Player1[our] takes first shoot
 
             players[0].CanShoot = true;
             players[1].CanShoot = false;
-            await _playersRepository.SaveChangesAsync();
 
+            await _playersRepository.SaveChangesAsync();
             await _gameRepository.AddNewGameAsync(players[0], players[1]);
             await _gameRepository.SaveChangesAsync();
 
