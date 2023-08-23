@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel;
 
 namespace BattleshipGame.API.Services
 {
@@ -70,9 +71,21 @@ namespace BattleshipGame.API.Services
             return message;
         }
 
-        public string ShotSuccess(int quantity)
+        public string ShotSuccess(int quantity, List<string> hitShipsCoords)
         {
-            string message = $"Shoot successful! You've hit {quantity} field(s).";
+            string message = "";
+
+            if (hitShipsCoords.Count > 1)
+            {
+                message = $"Shoot successful! You've hit {quantity} field(s). Let's take another shoot! Hit ships coordinates" +
+                    $" are displayed below.";
+            }
+
+            if (hitShipsCoords.Count == 1)
+            {
+                message = $"Shoot successful! You've hit {quantity} field(s). Hit ship was at (X,Y): " +
+                    $"({hitShipsCoords[0]}). Let's take another shoot!";
+            }
 
             return message;
         }

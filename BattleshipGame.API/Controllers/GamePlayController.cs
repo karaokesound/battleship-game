@@ -49,16 +49,21 @@ namespace BattleshipGame.API.Controllers
 
             // Updating opponent player's fields and returning hit fields that had a ship on them
 
-            List<string> hittedShipsCoords = await _service.UpdatePlayerFields(playerName, coordinates);
+            List<string> hitShipsCoords = await _service.UpdatePlayerFields(playerName, coordinates);
 
-            if (hittedShipsCoords.Count > 0)
+            if (hitShipsCoords.Count == 1)
             {
-                var message = _message.ShotSuccess(hittedShipsCoords.Count);
-                var jsonResult = new JsonResult(hittedShipsCoords);
-
-                return Ok(new { Message = message, Data = jsonResult.Value });
+                var message = _message.ShotSuccess(hitShipsCoords.Count, hitShipsCoords);
+                return Ok(message);
             }
+            else if (hitShipsCoords.Count > 1)
+            {
+                var jsonResult = new JsonResult(hitShipsCoords);
 
+                return Ok(new { Message = _message.ShotSuccess(hitShipsCoords.Count, hitShipsCoords), 
+                    Data = jsonResult.Value });
+            }
+                
             return Ok(_message.ShotMissed());
         }
 

@@ -16,7 +16,7 @@
 
         string ShootError(string opponent, string key);
 
-        string ShotSuccess(int quantity);
+        string ShotSuccess(int quantity, List<string> hitShipsCoords);
 
         string ShotMissed();
     }
