@@ -15,5 +15,9 @@ namespace BattleshipGame.API.Services.Controllers
         Task<List<string>> SetRandomShootAndUpdateFields();
 
         Task<string> RefreshGameBoard();
+
+        Task<List<string>> CoordinatesCheck(string coordinates);
+
+        Task<List<string>> GetAllHitFields(string playerName);
     }
 }

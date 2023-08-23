@@ -13,6 +13,8 @@ namespace BattleshipGame.API.Services.Repositories
 
         Task<List<string>> GetCurrentPlayersByFieldsAsync();
 
+        Task<List<string>> GetHitFields(string playerName);
+
         Task<bool> AddFieldAsync(Field field, PlayerEntity player);
 
         void UpdateFields(List<FieldEntity> hittedFields);

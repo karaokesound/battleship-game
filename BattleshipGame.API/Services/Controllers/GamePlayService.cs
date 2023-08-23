@@ -63,9 +63,7 @@ namespace BattleshipGame.API.Services.Controllers
         {
             var players = await GetPlayers();
 
-            // Validating coordinates
-
-            List<int> validCoordsId = _validation.CoordinatesValidation(coordinates);
+            List<int> validCoordsId = _validation.ValidateCoordsFormatAndReturnId(coordinates);
             List<FieldEntity> dbOpponentCoords = await _fieldRepository.GetInsertedFields(validCoordsId, players[1].Name);
 
             List<string> hittedShipsCoords = new List<string>();
@@ -106,25 +104,20 @@ namespace BattleshipGame.API.Services.Controllers
 
             // Set 3 random coords (computer move)
 
-            List<int> randomCoordinates = new List<int>();
+            List<int> randomCoordinates = _generatingService.GenerateRandomCoordinates(3);
+            List<FieldEntity> dbOpponentCoords = await _fieldRepository.GetInsertedFields(randomCoordinates, players[0].Name);
 
-            randomCoordinates = _generatingService.GenerateRandomCoordinates(3);
-            var dbOpponentCoords = _fieldRepository.GetInsertedFields(randomCoordinates, players[0].Name);
+            List<string> hittedShipsCoords = new List<string>();
 
-            List<FieldEntity> fieldsToUpdate = new List<FieldEntity>();
-            List<string> hittedFields = new List<string>();
-            FieldEntity field = await _fieldRepository.GetPlayerFieldAsync(players[0].Name, randomX, randomY);
-
-            if (field != null && field.IsEmpty)
+            foreach (var coord in dbOpponentCoords)
             {
-                field.IsHitted = true;
-                fieldsToUpdate.Add(field);
-            }
-            else if (field != null && !field.IsEmpty)
-            {
-                field.IsHitted = true;
-                fieldsToUpdate.Add(field);
-                hittedFields.Add($"(X, Y) : ({field.X}, {field.Y})");
+                if (!coord.IsEmpty)
+                {
+                    coord.IsHitted = true;
+                    hittedShipsCoords.Add($"(X, Y) : ({coord.X}, {coord.Y})");
+                }
+
+                coord.IsHitted = true;
             }
 
             // Changing the flag
@@ -132,14 +125,13 @@ namespace BattleshipGame.API.Services.Controllers
             players[1].CanShoot = true ? false : true;
             players[0].CanShoot = false ? false : true;
 
-
             // Database updating
 
-            _fieldRepository.UpdateFields(fieldsToUpdate);
+            _fieldRepository.UpdateFields(dbOpponentCoords);
             await _fieldRepository.SaveChangesAsync();
             await _playersRepository.SaveChangesAsync();
 
-            return hittedFields;
+            return hittedShipsCoords;
         }
 
         public async Task<string> RefreshGameBoard()
@@ -191,6 +183,26 @@ namespace BattleshipGame.API.Services.Controllers
             if (!selectedPlayer.CanShoot) message = $"Sorry! This operations can't be done. Now it's {secondPlayer.Name} turn";
 
             return message;
+        }
+
+        public async Task<List<string>> CoordinatesCheck(string coordinates)
+        {
+            var players = await GetPlayers();
+
+            List<int> validCoordsId = _validation.ValidateCoordsFormatAndReturnId(coordinates);
+            List<FieldEntity> dbOpponentCoords = await _fieldRepository.GetInsertedFields(validCoordsId, players[1].Name);
+
+            var usedFields = _validation.ValidateIfFieldsWereHit(dbOpponentCoords);
+            if (usedFields.Count > 0) return usedFields;
+
+            return usedFields; // Empty list
+        }
+
+        public async Task<List<string>> GetAllHitFields(string playerName)
+        {
+            var fields = await _fieldRepository.GetHitFields(playerName);
+
+            return fields;
         }
     }
 }

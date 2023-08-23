@@ -57,6 +57,23 @@ namespace BattleshipGame.API.Services.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<string>> GetHitFields(string playerName)
+        {
+            List<FieldEntity> playerHitFields = new List<FieldEntity>();
+            List<string> fields = new List<string>();
+
+            playerHitFields = await _context.Fields
+                .Where(f => f.Player.Name == playerName && f.IsHitted == true)
+                .ToListAsync();
+
+            foreach (var field in playerHitFields)
+            {
+                fields.Add($"{field.X}, {field.Y}");
+            }
+
+            return fields;
+        }
+
         public async Task<bool> AddFieldAsync(Field field, PlayerEntity player)
         {
             _context.Fields.Add(

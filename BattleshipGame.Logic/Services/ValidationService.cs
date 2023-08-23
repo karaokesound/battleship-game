@@ -1,6 +1,5 @@
 ﻿using BattleshipGame.API.Models.Game;
 using BattleshipGame.Data.Entities;
-using System.ComponentModel;
 
 namespace BattleshipGame.Logic.Services
 {
@@ -175,13 +174,13 @@ namespace BattleshipGame.Logic.Services
             return true;
         }
 
-        public List<int> CoordinatesValidation(string coordinates)
+        public List<int> ValidateCoordsFormatAndReturnId(string coordinates)
         {
             List<int> validCoords = new List<int>();
 
             string[] coordinatePairs = coordinates.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-            if (coordinatePairs.Length > 5) return validCoords; // Empty list
+            if (coordinatePairs.Length > 3) return validCoords; // Empty list
 
             int x;
             int y;
@@ -202,6 +201,18 @@ namespace BattleshipGame.Logic.Services
             }
 
             return validCoords;
+        }
+
+        public List<string> ValidateIfFieldsWereHit(List<FieldEntity> fields)
+        {
+            List<string> fieldsAlreadyHit = new List<string>();
+
+            foreach (var field in fields)
+            {
+                if (field.IsHitted) fieldsAlreadyHit.Add($"{field.X}, {field.Y}");
+            }
+
+            return fieldsAlreadyHit;
         }
     }
 }

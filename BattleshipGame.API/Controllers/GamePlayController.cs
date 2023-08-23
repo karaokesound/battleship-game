@@ -26,6 +26,7 @@ namespace BattleshipGame.API.Controllers
             [SwaggerParameter(Description = "Name of the player who shoots [your nickname]")] string playerName,
             [SwaggerParameter(Description = "Coordinates in the format (x,y): 0,1 2,1")] string coordinates)
         {
+            var players = await _service.GetPlayers();
             var result = await _service.PlayersAndCoordsNullCheck(playerName, coordinates);
 
             if (result != "") return BadRequest(result);
@@ -33,6 +34,18 @@ namespace BattleshipGame.API.Controllers
             result = await _service.FlagCheck(0);
 
             if (result != "") return BadRequest(result);
+
+            List<string> fieldsAlreadyHit = await _service.CoordinatesCheck(coordinates);
+            List<string> allHitFields = await _service.GetAllHitFields(players[1].Name);
+
+            if (fieldsAlreadyHit.Count > 0)
+            {
+                var jsonResult = new JsonResult(fieldsAlreadyHit);
+                var jsonResult2 = new JsonResult(allHitFields);
+
+                return BadRequest(new { Message = "This field was already hit! Hit field which wasn't used before.",
+                    Data = jsonResult.Value, jsonResult2.Value });
+            }
 
             // Updating opponent player's fields and returning hit fields that had a ship on them
 
