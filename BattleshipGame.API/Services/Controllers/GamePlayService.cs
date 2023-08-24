@@ -53,11 +53,11 @@ namespace BattleshipGame.API.Services.Controllers
 
             var result = _validation.ValidateCoordsFormatAndReturnId(coordinates);
 
-            if (players[0].SunkenShips != null && players[0].SunkenShips == 12)
+            if (players[0].SunkenShips == 12)
             {
                 return $"The game is over. {players[0].Name} has won.";
             }
-            else if (players[1].SunkenShips != null && players[1].SunkenShips == 12)
+            else if (players[1].SunkenShips == 12)
             {
                 return $"The game is over. {players[1].Name} has won.";
             }

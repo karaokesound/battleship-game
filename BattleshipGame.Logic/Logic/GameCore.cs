@@ -72,44 +72,7 @@ namespace BattleshipGame.Logic.Logic
                     int tripleShipDirection = random.Next(2) == 0 ? 1 : -1;
 
                     bool verticalHorizontal = random.Next(4) != 0;
-                    bool mixedDirection = random.Next(2) == 0 ? true : false;
 
-                    //if (ship.Size == 4)
-                    //{
-                    //    // horizontal
-
-                    //    if (!verticalHorizontal && !mixedDirection)
-                    //    {
-                    //        if (startX > 3)
-                    //        {
-                    //            endX = startX - 3;
-                    //            endY = startY;
-                    //        }
-
-                    //        endX = startX + 3;
-                    //        endY = startY;
-                    //    }
-
-                    //    // vertical
-
-                    //    else if (verticalHorizontal && !mixedDirection)
-                    //    {
-                    //        if (startY > 3)
-                    //        {
-                    //            endY = startY - 3;
-                    //            endX = startX;
-                    //        }
-
-                    //        endY = startY + 3;
-                    //        endX = startX;
-                    //    }
-
-                    //    if (ValidateFields(ship, startX, startY, endX, endY))
-                    //    {
-                    //        break;
-                    //    }
-                    //    tryCount++;
-                    //}
                     if (ship.Size == 3)
                     {
                         if (!verticalHorizontal && tripleShipDirection == 1)
