@@ -180,7 +180,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://localhost:{{portNumber}}/api/game/board/Player2",
+					"raw": "https://localhost:{{portNumber}}/api/game/board/Player1",
 					"protocol": "https",
 					"host": [
 						"localhost"
@@ -190,19 +190,19 @@
 						"api",
 						"game",
 						"board",
-						"Player2"
+						"Player1"
 					]
 				}
 			},
 			"response": []
 		},
 		{
-			"name": "POST GameBoards",
+			"name": "POST StartGame",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"url": {
-					"raw": "https://localhost:{{portNumber}}/api/game/1/Player2",
+					"raw": "https://localhost:{{portNumber}}/api/game/start/1/Player1",
 					"protocol": "https",
 					"host": [
 						"localhost"
@@ -211,8 +211,87 @@
 					"path": [
 						"api",
 						"game",
+						"start",
 						"1",
-						"Player2"
+						"Player1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH ShootByPlayer",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:{{portNumber}}/api/game/shoot/Player1?coordinates=2%2C3",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{portNumber}}",
+					"path": [
+						"api",
+						"game",
+						"shoot",
+						"Player1"
+					],
+					"query": [
+						{
+							"key": "coordinates",
+							"value": "2%2C3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH ShootByPlayer(multiple)",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7177/api/game/shoot/Player1?coordinates=5%2C1%205%2C3%205%2C4'",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7177",
+					"path": [
+						"api",
+						"game",
+						"shoot",
+						"Player1"
+					],
+					"query": [
+						{
+							"key": "coordinates",
+							"value": "5%2C1%205%2C3%205%2C4'"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PATCH ShootByOpponent",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:{{portNumber}}/api/game/shoot/opponent",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "{{portNumber}}",
+					"path": [
+						"api",
+						"game",
+						"shoot",
+						"opponent"
 					]
 				}
 			},

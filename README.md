@@ -1,11 +1,11 @@
 ﻿# Battleship Game
-Battleship Game jest podzielona na 3 projekty:
+Gra Battleship Game jest podzielona na 3 mniejsze projekty:
 - BattleshipGame.API
-Projekt ten implementuje wzorzec MVC, dodatkowo znajdują się w nim repozytoria (IField, IGame, IPlayer), które służą do komunikacji z bazą danych oraz serwis IMessageService, wykorzystywany do zwracania tekstowych wiadomości dla poszczególnych status code'ów.
+Projekt ten implementuje wzorzec MVC, znajdują się w nim repozytoria (IField, IGame, IPlayer), które służą do komunikacji z bazą danych oraz serwisy dla poszczególnych kontrolerów.
 - BattleshipGame.Data
-Projekt, który implementuje Entity Framework i określa strukturę bazy danych. Znajdują się tu encje, dbcontext oraz konfiguracje dla poszczególnych encji (fluent API).
+Projekt, który implementuje Entity Framework i określa strukturę bazy danych. Znajdują się tu encje, Dbcontext oraz konfiguracje dla poszczególnych encji (fluent API).
 - BattleshipGame.Logic
-Projekt, który przedstawia całą logikę gry, czyli m.in. tworzenie planszy, losowanie koordynatów poszczególnych statków, etc. Zawiera 2 serwisy - jeden do walidacji danych, drugi do generowania poszczególnych elementów gry oraz modele.
+Projekt, który przechowuje logikę generowania gry, czyli m.in. tworzenie planszy, losowanie koordynatów poszczególnych statków, etc. Zawiera 2 serwisy - jeden do walidacji danych, drugi do generowania poszczególnych elementów gry oraz folder z modelami.
 ## Projekt
 W projekcie wykorzystano
 - ASP.NET Core v.6.0
@@ -16,7 +16,7 @@ W projekcie wykorzystano
 
 ## Instrukcja 
 ### Konfiguracja
-Przy pierwszej kompilacji programu, baza danych powinna automatycznie się utworzyć, wraz z kilkoma domyślnie wprowadzonymi graczami. Jeśli by się tak nie stało, to należy utworzyć bazę danych ręcznie za pomocą komendy:
+Przy pierwszej kompilacji programu, baza danych powinna automatycznie się utworzyć, wraz z kilkoma domyślnie wprowadzonymi graczami. Jeśli tak się nie stanie, to należy utworzyć bazę danych ręcznie za pomocą komendy:
 ##### Package Manager Console
 - update-database
 ##### CLI
@@ -28,20 +28,25 @@ Przy pierwszej kompilacji programu, baza danych powinna automatycznie się utwor
 
 ## Gra
 Gra daje także możliwość usuwania gracza (DELETE), modyfikowania (PUT) i częściowego modyfikowania (PATCH).
-Przed wykonaniem jakiegokolwiek requestu, musimy upewnić się, że ustawiliśmy obsługiwany format na **application/json**.
-
-Przed rozpoczęciem gry możemy:
-1. osobno wygenerować planszę dla 2 graczy
-/api/game/{playerName}
-2. wyświetlić wygenerowane plansze
-/api/game/board/{playerName}
+Przed wykonaniem jakiegokolwiek requestu dotyczącego Playera, musimy upewnić się, że ustawiliśmy obsługiwany format na **application/json**.
 
 Gra jest obsługiwana przez API. Poszczególne etapy gry wyglądają następująco:
-1. POST /api/game/{key}/{playerName}
+1. POST /api/game/start/{key}/{playerName}
 Request, który rozpoczyna nową grę. Należy wpisać 1 jako key i podać nazwę użytkownika, z którą chcemy dołączyć do gry [gracz musi istnieć w bazie].
-2. POST /api/game/{playerName}/shoot
-Request, który odpowiada za wykonywanie strzałów w planszę przeciwnika. Można podać max. 5 par koordynatów w formacie 0,1 0,2 4,2 3,1 etc.
-3. ...
+2. GET /api/game/board/{playerName}
+Request, który odpowiada za wyświetlenie planszy. Możemy sprawdzić wygenerowane statki i ich położenie.
+3. PATCH /api/game/shoot/{playerName}
+ Request, który odpowiada za wykonywanie strzałów na planszę przeciwnika. Można wprowadzić max. 3 pary koordynatów w formacie 0,1 0,2 4,2 etc.
+4. PATCH /api/game/shoot/opponent
+Request, który odpowiada za oddawanie strzałów przez komputer na planszę gracza.
+
+Gra kończy się w momencie, gdy któryś z graczy zestrzeli wszystkie 12 statków przeciwnika.
+
+## Założenia
+- Gra obsługuje wyłącznie dwóch graczy i nie przechowuje większej ilości gier.
+- Gra generuje 12 statków
+- Gra pozwala na oddawanie jednocześnie 3 strzałów
+- Celny strzał pozwala na wykonanie kolejnego strzału w tej samej kolejce
 
 ### Postman
 Grę można testować również z poziomu Postmana. Gotowy plik znajduje się w repozytorium na Githubie.
