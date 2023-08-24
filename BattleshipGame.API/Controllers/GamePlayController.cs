@@ -19,9 +19,8 @@ namespace BattleshipGame.API.Controllers
             _service = service;
         }
         
-        [SwaggerOperation(Summary = "Shoots at target coordinates.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Shot was successful.")]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid coordinates format.")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid operation.")]
         [HttpPatch("shoot/{playerName}")]
         public async Task<ActionResult> ShootByPlayer(
             [SwaggerParameter(Description = "Name of the player who shoots [your nickname]")] string playerName,
@@ -60,7 +59,7 @@ namespace BattleshipGame.API.Controllers
 
             if (response.Message != null) return Ok(response);
                 
-            return Ok(_message.ShotMissed());
+            return Ok(_message.ShotMissed(players, playerName));
         }
 
         [HttpPatch("shoot/opponent")]
@@ -76,13 +75,14 @@ namespace BattleshipGame.API.Controllers
             // the method sets IsHitted property and count sunken ships by computer. If computer hit any field with
             // a ship on it, in "response" we will receive coordinates of all such fields
 
-            CombinedResponseData response = await _service.SetRandomShootAndUpdateFields();
+            CombinedResponseData response = await _service.UpdatePlayerFields(players[1].Name, "");
 
             if (response.Message != null) return Ok(response);
 
             var refreshedGameBoard = await _service.RefreshGameBoard();
+            var message = _message.ShotMissed(players, players[1].Name);
 
-            return Ok(new { Message = "Opponent has missed", Data = refreshedGameBoard });
+            return Ok(new { Message = message, Data = refreshedGameBoard });
         }
     }
 }

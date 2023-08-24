@@ -13,8 +13,6 @@ namespace BattleshipGame.API.Services.Controllers
 
         Task<string> FlagCheck(int value);
 
-        Task<CombinedResponseData> SetRandomShootAndUpdateFields();
-
         Task<string> RefreshGameBoard();
 
         Task<List<string>> GetHitFields(string coordinates);

@@ -3,8 +3,6 @@ using BattleshipGame.API.Models.Game;
 using BattleshipGame.API.Services.Repositories;
 using BattleshipGame.Data.Entities;
 using BattleshipGame.Logic.Services;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace BattleshipGame.API.Services.Controllers
 {
@@ -53,7 +51,13 @@ namespace BattleshipGame.API.Services.Controllers
         {
             var players = await GetPlayers();
 
-            if (string.IsNullOrEmpty(coordinates) || players[0] == null || players[1] == null || players[0].Name != playerName)
+            var result = _validation.ValidateCoordsFormatAndReturnId(coordinates);
+
+            if (players[0].SunkenShips == 12) return $"The game is over. {players[0].Name} has won.";
+            else if (players[1].SunkenShips == 12) return $"The game is over. {players[1].Name} has won.";
+
+            if (string.IsNullOrEmpty(coordinates) || result.Count == 0
+                || players[0] == null || players[1] == null || players[0].Name != playerName)
             {
                 return _message.ShootError(players[1].Name, "0");
             }
@@ -65,9 +69,20 @@ namespace BattleshipGame.API.Services.Controllers
         {
             var players = await GetPlayers();
 
-            List<int> validCoordsId = _validation.ValidateCoordsFormatAndReturnId(coordinates);
+            List<FieldEntity> dbOpponentCoords = new List<FieldEntity>();
 
-            List<FieldEntity> dbOpponentCoords = await _fieldRepository.GetInsertedFields(validCoordsId, players[1].Name);
+            if (playerName == players[0].Name)
+            {
+                List<int> validCoordsId = _validation.ValidateCoordsFormatAndReturnId(coordinates);
+                dbOpponentCoords = await _fieldRepository.GetInsertedFields(validCoordsId, players[1].Name);
+            }
+            else if (playerName == players[1].Name)
+            {
+                // Set 3 random coords (computer move)
+
+                List<int> randomCoordinates = _generatingService.GenerateRandomCoordinates(3);
+                dbOpponentCoords = await _fieldRepository.GetInsertedFields(randomCoordinates, players[0].Name);
+            }
 
             List<string> hitShipsCoords = new List<string>();
 
@@ -98,82 +113,16 @@ namespace BattleshipGame.API.Services.Controllers
 
                 if (!canTakeAnotherShoot)
                 {
-                    players[0].CanShoot = true ? false : true;
-                    players[1].CanShoot = false ? false : true;
-                }
-            }
-
-            // Database updating
-
-            _fieldRepository.UpdateFields(dbOpponentCoords);
-            await _fieldRepository.SaveChangesAsync();
-            await _playersRepository.SaveChangesAsync();
-
-            CombinedResponseData combinedObject = new CombinedResponseData();
-
-            if (players[0].SunkenShips == 12)
-            {
-                string message = "Congratulate! You've won the game!";
-                combinedObject.Message = message;
-                return combinedObject;
-            }
-
-            if (hitShipsCoords.Count > 0)
-            {
-                string message = _message.ShotSuccess(hitShipsCoords.Count, hitShipsCoords);
-                var data = new JsonResult(hitShipsCoords);
-                combinedObject.Message = message;
-                combinedObject.JsonData = data.Value;
-
-                return combinedObject;
-            }
-
-            return combinedObject;
-        }
-
-        public async Task<CombinedResponseData> SetRandomShootAndUpdateFields()
-        {
-            var players = await GetPlayers();
-
-            // Set 3 random coords (computer move)
-
-            List<int> randomCoordinates = _generatingService.GenerateRandomCoordinates(3);
-
-            List<FieldEntity> dbOpponentCoords = await _fieldRepository.GetInsertedFields(randomCoordinates, players[0].Name);
-
-            List<string> hitShipsCoords = new List<string>();
-
-            if (dbOpponentCoords.Any())
-            {
-                bool canTakeAnotherShoot = false;
-
-                foreach (var coord in dbOpponentCoords)
-                {
-                    if (!coord.IsEmpty)
+                    if (playerName == players[0].Name)
                     {
-                        coord.IsHitted = true;
-                        _fieldRepository.UpdateField(coord);
-                        await _fieldRepository.SaveChangesAsync();
-
-                        hitShipsCoords.Add($"(X, Y) : ({coord.X}, {coord.Y})");
-
-                        await CountSunkenShips(coord, players[1]);
-
-                        // Take the next loop
-
-                        canTakeAnotherShoot = true;
-                        continue;
+                        players[0].CanShoot = true ? false : true;
+                        players[1].CanShoot = false ? false : true;
                     }
-
-                    coord.IsHitted = true;
-                }
-
-                // Changing the flag
-
-                if (!canTakeAnotherShoot)
-                {
-                    players[1].CanShoot = true ? false : true;
-                    players[0].CanShoot = false ? false : true;
+                    else if (playerName == players[1].Name)
+                    {
+                        players[1].CanShoot = true ? false : true;
+                        players[0].CanShoot = false ? false : true;
+                    }
                 }
             }
 
@@ -183,26 +132,7 @@ namespace BattleshipGame.API.Services.Controllers
             await _fieldRepository.SaveChangesAsync();
             await _playersRepository.SaveChangesAsync();
 
-            CombinedResponseData combinedObject = new CombinedResponseData();
-
-            if (players[1].SunkenShips == 12)
-            {
-                string message = "You've lost! The Opponent destroyed all your ships! Try again by setting new game.";
-                combinedObject.Message = message;
-                return combinedObject;
-            }
-
-            if (hitShipsCoords.Count > 0)
-            {
-                string message = $"{players[1].Name} hit {hitShipsCoords.Count} of your field(s). See details below.";
-                var data = new JsonResult(hitShipsCoords);
-                combinedObject.Message = message;
-                combinedObject.JsonData = data.Value;
-
-                return combinedObject;
-            }
-
-            return combinedObject;
+            return _message.AdjustResponseByPlayerName(players, playerName, hitShipsCoords);
         }
 
         public async Task<string> FlagCheck(int value)
@@ -233,11 +163,9 @@ namespace BattleshipGame.API.Services.Controllers
                 return _message.PlayerNotFoundMessage();
             }
 
-            string message = "";
+            if (!selectedPlayer.CanShoot) return _message.InvalidOperation(players, selectedPlayer.Name);
 
-            if (!selectedPlayer.CanShoot) message = $"Sorry! This operations can't be done. Now it's {secondPlayer.Name} turn";
-
-            return message;
+            return ""; // Empty string
         }
 
         public async Task<List<string>> GetHitFields(string coordinates)

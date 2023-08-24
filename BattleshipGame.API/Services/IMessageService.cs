@@ -1,4 +1,7 @@
-﻿namespace BattleshipGame.API.Services
+﻿using BattleshipGame.Data.Entities;
+using static BattleshipGame.API.Services.Controllers.GamePlayService;
+
+namespace BattleshipGame.API.Services
 {
     public interface IMessageService
     {
@@ -18,6 +21,11 @@
 
         string ShotSuccess(int quantity, List<string> hitShipsCoords);
 
-        string ShotMissed();
+        string ShotMissed(List<PlayerEntity> players, string playerName);
+
+        string InvalidOperation(List<PlayerEntity> players, string playerName);
+
+        CombinedResponseData AdjustResponseByPlayerName(List<PlayerEntity> players, string playerName,
+            List<string> hitShipsCoords);
     }
 }

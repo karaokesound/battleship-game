@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BattleshipGame.Data.Entities;
+using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
+using static BattleshipGame.API.Services.Controllers.GamePlayService;
 
 namespace BattleshipGame.API.Services
 {
@@ -90,11 +92,81 @@ namespace BattleshipGame.API.Services
             return message;
         }
 
-        public string ShotMissed()
+        public string InvalidOperation(List<PlayerEntity> players, string playerName)
         {
-            string message = $"You didn't hit any enemy ships, try again in the next round!";
+            string message = "";
+
+            if (players[0].Name == playerName)
+            {
+                message = $"Sorry! You have taken your shot, now it's {players[1].Name} turn. Take your chance in the next round!";
+            }
+            else if (players[1].Name == playerName)
+            {
+                message = $"Sorry! This operation can't be done. The previous shot was missed, so now it's {players[0].Name} turn.";
+            }
 
             return message;
+        }
+
+        public string ShotMissed(List<PlayerEntity> players, string playerName)
+        {
+            string message = "";
+
+            if (players[0].Name == playerName)
+            {
+                message = "You took the shot, but unfortunately didn't hit an enemy ships. Try again in the next round!";
+            }
+            else if (players[1].Name == playerName)
+            {
+                message = "The shot made by the computer was a miss.";
+            }
+            
+            return message;
+        }
+
+        public CombinedResponseData AdjustResponseByPlayerName(List<PlayerEntity> players, string playerName,
+            List<string> hitShipsCoords)
+        {
+            CombinedResponseData combinedObject = new CombinedResponseData();
+
+            // Player
+
+            if (players[0].SunkenShips == 12)
+            {
+                string message = "Congratulate! You've won the game!";
+                combinedObject.Message = message;
+                return combinedObject;
+            }
+            else if (players[1].SunkenShips == 12)
+            {
+                string message = "You've lost! The Opponent destroyed all your ships! Try again by setting new game.";
+                combinedObject.Message = message;
+                return combinedObject;
+            }
+
+            // Opponent (computer)
+
+            if (hitShipsCoords.Count > 0 && playerName == players[1].Name)
+            {
+                string message = $"{players[1].Name} hit {hitShipsCoords.Count} of your field(s). See details below.";
+                var data = new JsonResult(hitShipsCoords);
+                combinedObject.Message = message;
+                combinedObject.JsonData = data.Value;
+
+                return combinedObject;
+            }
+
+            if (hitShipsCoords.Count > 0 && playerName == players[0].Name)
+            {
+                string message = ShotSuccess(hitShipsCoords.Count, hitShipsCoords);
+                var data = new JsonResult(hitShipsCoords);
+                combinedObject.Message = message;
+                combinedObject.JsonData = data.Value;
+
+                return combinedObject;
+            }
+
+            return combinedObject;
         }
     }
 }
