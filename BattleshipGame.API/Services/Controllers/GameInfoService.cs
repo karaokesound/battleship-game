@@ -32,7 +32,7 @@ namespace BattleshipGame.API.Services.Controllers
             var player1 = await _playersRepository.GetPlayerAsync(playersIds[0]);
             var player2 = await _playersRepository.GetPlayerAsync(playersIds[1]);
 
-            if (playerName != player1.Name && playerName != player2.Name)
+            if (player1 == null || player2 == null || playerName != player1.Name && playerName != player2.Name)
             {
                 return false;
             }
