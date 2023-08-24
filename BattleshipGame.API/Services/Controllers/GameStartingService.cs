@@ -51,7 +51,7 @@ namespace BattleshipGame.API.Services.Controllers
 
             if (key != 1 || player1 == null || player2 == null) return players; // Empty list
 
-            player1.SunkenShips = 11;
+            player1.SunkenShips = 0;
             players.Add(player1);
 
             player2.SunkenShips = 0;

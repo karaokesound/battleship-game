@@ -56,9 +56,11 @@ namespace BattleshipGame.API.Services.Controllers
             if (players[0].SunkenShips == 12) return $"The game is over. {players[0].Name} has won.";
             else if (players[1].SunkenShips == 12) return $"The game is over. {players[1].Name} has won.";
 
-            if (string.IsNullOrEmpty(coordinates) || result.Count == 0
+            if (string.IsNullOrEmpty(coordinates) || result.Count == 0 || result.Count > 6
                 || players[0] == null || players[1] == null || players[0].Name != playerName)
             {
+                if (result.Count > 6) return _message.ShootError(players[1].Name, "2");
+
                 return _message.ShootError(players[1].Name, "0");
             }
 

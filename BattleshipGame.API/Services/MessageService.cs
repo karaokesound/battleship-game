@@ -67,7 +67,7 @@ namespace BattleshipGame.API.Services
             }
             else if (key == "2")
             {
-                message = "Sorry! You can pass maximum 5 pair of coordinates. Make sure your format is correct and try again.";
+                message = "Sorry! You can pass maximum 3 pair of coordinates. Make sure your format is correct and try again.";
             }
 
             return message;
@@ -102,7 +102,7 @@ namespace BattleshipGame.API.Services
             }
             else if (players[1].Name == playerName)
             {
-                message = $"Sorry! This operation can't be done. The previous shot was missed, so now it's {players[0].Name} turn.";
+                message = $"Sorry! This operation can't be done. It's the {players[0].Name} turn to take the shot.";
             }
 
             return message;
@@ -114,7 +114,7 @@ namespace BattleshipGame.API.Services
 
             if (players[0].Name == playerName)
             {
-                message = "You took the shot, but unfortunately didn't hit an enemy ships. Try again in the next round!";
+                message = "You took the shot, but unfortunately didn't hit any of the enemy ships. Try again in the next round!";
             }
             else if (players[1].Name == playerName)
             {

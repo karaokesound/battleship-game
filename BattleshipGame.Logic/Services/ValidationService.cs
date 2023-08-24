@@ -185,8 +185,6 @@ namespace BattleshipGame.Logic.Services
 
             string[] coordinatePairs = coordinates.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-            if (coordinatePairs.Length > 3) return validCoords; // Empty list
-
             int x;
             int y;
 
@@ -200,6 +198,8 @@ namespace BattleshipGame.Logic.Services
                 {
                     return validCoords; // Empty list
                 }
+
+                if (x > 9 || y > 9) return validCoords; // Empty list
 
                 validCoords.Add(x);
                 validCoords.Add(y);

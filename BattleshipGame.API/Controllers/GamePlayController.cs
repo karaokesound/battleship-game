@@ -24,7 +24,7 @@ namespace BattleshipGame.API.Controllers
         [HttpPatch("shoot/{playerName}")]
         public async Task<ActionResult> ShootByPlayer(
             [SwaggerParameter(Description = "Name of the player who shoots [your nickname]")] string playerName,
-            [SwaggerParameter(Description = "Coordinates in the format (x,y): 0,1 2,1")] string coordinates)
+            [SwaggerParameter(Description = "Max. 3 pair of coordinates in the format (x,y): 0,1 2,1")] string coordinates)
         {
             var players = await _service.GetPlayers();
 

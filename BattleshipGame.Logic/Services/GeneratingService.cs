@@ -76,11 +76,18 @@ namespace BattleshipGame.Logic.Services
                 for (int x = 0; x < XFields; x++)
                 {
                     var field = fields.FirstOrDefault(f => f.X == x && f.Y == y);
-                    if (field != null && !field.IsEmpty)
+
+                    if (field == null) return "Something gone wrong";
+
+                    if (field.IsHitted)
+                    {
+                        gameBoard.Append("X ");
+                    }
+                    else if (!field.IsEmpty)
                     {
                         gameBoard.Append("1 ");
                     }
-                    else
+                    else if (field.IsEmpty)
                     {
                         gameBoard.Append("0 ");
                     }
