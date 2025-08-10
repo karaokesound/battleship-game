@@ -1,4 +1,8 @@
-﻿# Battleship Game
+A battle ship game project that implements the basic rules and functionalities of this game. It is written based on the ASP.NET Core platform and the MVC pattern using the SQLite database with Entity Framework as an ORM. An API has also been prepared for the project, through which the entire gameplay takes place.
+
+Projekt gry w statki implementujący podstawowe zasady i funkcjonalności tej gry. Jest napisany w oparciu o platformę ASP.NET Core i wzorzec MVC z wykorzystaniem bazy danych SQLite z Entity Framework jako ORM. Do projektu przygotowano również API za pomocą którego odbywa się cała rozgrywka.
+ 
+ # Battleship Game
 Gra Battleship Game jest podzielona na 3 mniejsze projekty:
 - BattleshipGame.API
 Projekt ten implementuje wzorzec MVC, znajdują się w nim repozytoria (IField, IGame, IPlayer), które służą do komunikacji z bazą danych oraz serwisy dla poszczególnych kontrolerów.
